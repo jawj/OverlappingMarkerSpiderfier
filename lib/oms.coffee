@@ -3,11 +3,20 @@
 OverlappingMarkerSpiderfier
 Copyright (c) 2011 George MacKerron
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or substantial
+portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ###
 
@@ -42,9 +51,10 @@ class OverlappingMarkerSpiderfier
     @projHelper = new @constructor.ProjHelper(@map)
     @markers = []
     @listeners = {}
-    gm.event.addListener(@map, e, => @unspiderfy()) for e in ['click', 'zoom_changed', 'maptypeid_changed']
+    for e in ['click', 'zoom_changed', 'maptypeid_changed']
+      gm.event.addListener(@map, e, => @unspiderfy()) 
     
-  addListener: (event, func) ->  # available listeners: click(marker), spiderfy(markers), unspiderfy(markers)
+  addListener: (event, func) ->  # listeners: click(marker), spiderfy(markers), unspiderfy(markers)
     (@listeners[event] ?= []).push(func)
     this  # return self, for chaining
     
@@ -74,14 +84,16 @@ class OverlappingMarkerSpiderfier
     angleStep = twoPi / count
     for i in [0...count]
       angle = @circleStartAngle + i * angleStep
-      new gm.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle))
+      new gm.Point(centerPt.x + legLength * Math.cos(angle), 
+                   centerPt.y + legLength * Math.sin(angle))
     
   generatePtsSpiral: (count, centerPt) ->
     legLength = @spiralLengthStart
     angle = 0
     for i in [0...count]
       angle += @spiralFootSeparation / legLength + i * 0.0005
-      pt = new gm.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle))
+      pt = new gm.Point(centerPt.x + legLength * Math.cos(angle), 
+                        centerPt.y + legLength * Math.sin(angle))
       legLength += twoPi * @spiralLengthFactor / angle
       pt
     
@@ -99,16 +111,20 @@ class OverlappingMarkerSpiderfier
   
   makeHighlightListeners: (marker) ->
     highlight: 
-      => marker.omsData.leg.setOptions(strokeColor: @legColors.highlighted[@map.mapTypeId], zIndex: @highlightedLegZIndex)
+      => marker.omsData.leg.setOptions
+        strokeColor: @legColors.highlighted[@map.mapTypeId]
+        zIndex: @highlightedLegZIndex
     unhighlight: 
-      => marker.omsData.leg.setOptions(strokeColor: @legColors.usual[@map.mapTypeId], zIndex: @usualLegZIndex)
+      => marker.omsData.leg.setOptions
+        strokeColor: @legColors.usual[@map.mapTypeId]
+        zIndex: @usualLegZIndex
   
   spiderfy: (markerData) ->
     @spiderfied = yes
     numFeet = markerData.length
     bodyPt = @ptAverage(md.markerPt for md in markerData)
     footPts = if numFeet >= @circleSpiralSwitchover 
-      @generatePtsSpiral(numFeet, bodyPt).reverse()  # match spiral points from outside in -> less criss-crossing
+      @generatePtsSpiral(numFeet, bodyPt).reverse()  # match from outside in => less criss-crossing
     else
       @generatePtsCircle(numFeet, bodyPt)
     spiderfiedMarkers = []
@@ -174,8 +190,9 @@ class OverlappingMarkerSpiderfier
         bestVal = val
         bestIndex = index
     set.splice(bestIndex, 1)[0]
-    
-OverlappingMarkerSpiderfier.ProjHelper = (map) -> @setMap(map)  # this object is just used to get the map's projection
+
+# the ProjHelper object is just used to get the map's projection
+OverlappingMarkerSpiderfier.ProjHelper = (map) -> @setMap(map)  
 OverlappingMarkerSpiderfier.ProjHelper.prototype = new gm.OverlayView()
 OverlappingMarkerSpiderfier.ProjHelper.prototype.draw = ->  # dummy function
 
