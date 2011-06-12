@@ -1,7 +1,7 @@
 
-Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that overlap each other spring apart gracefully when you click them, so you can pick the one you meant?
+*Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that overlap each other spring apart gracefully when you click them, so you can pick the one you meant?*
 
-And ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing *doesn't* happen?
+*Ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing doesn't happen?*
 
 This code makes Google Maps API *version 3* map markers behave in that Google Earth way (minus, at least as yet, the snazzy animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
 
@@ -13,7 +13,7 @@ h3. Doesn't clustering solve this problem?
 
 You may have seen the "marker clustering library":http://gmaps-utility-library-dev.googlecode.com/svn/tags/markerclusterer/1.0/docs/reference.html, which also helps deal with markers that are close together.
 
-They might be what you want. However, they probably *aren't* what you want if you have markers that are in the exact same location, or are close enough to overlap even at the maximum zoom level. In that case, clustering won't help your users pick out (and find out more about) the marker they want.
+That might be what you want. However, it probably *isn't* what you want if you have markers that are in the exact same location, or are close enough to overlap even at the maximum zoom level. In that case, clustering won't help your users pick out (and find out more about) the marker they want.
 
 h2. Demo
 
