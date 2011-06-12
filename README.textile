@@ -9,13 +9,21 @@ The compiled code has no dependencies (except Google Maps), so you can use it wi
 
 I wrote it as part of the data download feature for "Mappiness":http://www.mappiness.org.uk.
 
+h3. Doesn't clustering solve this problem?
+
+You may have seen the "marker clustering library":http://gmaps-utility-library-dev.googlecode.com/svn/tags/markerclusterer/1.0/docs/reference.html, which also helps deal with markers that are close together.
+
+They might be what you want. However, they probably *aren't* what you want if you have markers that are in the exact same location, or are close enough to overlap even at the maximum zoom level. In that case, clustering won't help your users pick out (and find out more about) the marker they want.
+
 h2. Demo
 
-Try it on the (sorry, kind-of-boring) "demo map":http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html.
+See the (sorry, kinda boring) "demo map":http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html.
 
-h2. Example code
+h2. How to use
 
-This example is in CoffeeScript. Create your map like normal:
+This how-to is in CoffeeScript, but obviously it'll work from plain old regular JavaScript too. 
+
+Create your map like normal:
 
 bc. gm = google.maps
 map = new gm.Map(
@@ -28,14 +36,14 @@ Create an @OverlappingMarkerSpiderfier@ instance:
 
 bc. oms = new OverlappingMarkerSpiderfier(map)
 
-Instead of adding click listeners to your markers directly via @google.maps.event.addListener@, add a global listener on the @OverlappingMarkerSpiderfier@ instance instead. This listener will be passed the clicked marker as its first argument.
+Instead of adding click listeners to your markers directly via @google.maps.event.addListener@, add a global listener on the @OverlappingMarkerSpiderfier@ instance instead. The listener will be passed the clicked marker as its first argument.
 
 bc. iw = new gm.InfoWindow()
 oms.addListener 'click', (marker) ->
   iw.setContent(marker.desc)
   iw.open(map, marker)
   
-You can also add listeners for the @spiderfy@ and @unspiderfy@ events, which are each passed an array of the markers affected. In this example, we observe only the @spiderfy@ event, using it to close any open @InfoWindow@:
+You can also add listeners on the @spiderfy@ and @unspiderfy@ events, which will be passed an array of the markers affected. In this example, we observe only the @spiderfy@ event, using it to close any open @InfoWindow@:
   
 bc. oms.addListener 'spiderfy', (markers) -> 
   iw.close()
@@ -72,7 +80,7 @@ Adds a listener to react to one of three events.
 
 @event@ may be @'click'@, @'spiderfy'@ or @'unspiderfy'@.
 
-@listenerFunc@ expects as its single argument a single marker object (@click@) or an array thereof (@spiderfy@ and @unspiderfy@).
+@listenerFunc@ will receive as its argument a single marker object (@click@) or an array thereof (@spiderfy@ and @unspiderfy@).
 
 h2. Options
 
