@@ -58,13 +58,21 @@ h3. Construction
 
 bc. new OverlappingMarkerSpiderfier(map)
 
+Creates an instance associated with @map@ (a @google.maps.Map@).
+
 h3. Instance methods
 
 bc. addMarker(marker)
 
-bc. addListener(listener, listenerFunc)
+Adds @marker@ (a @google.maps.Marker@) to be tracked.
 
-Where @listener@ is one of @'click'@, @'spiderfy'@ or @'unspiderfy'@ and @listenerFunc@ expects as its single argument a single marker object (@click@) or an array thereof (@spiderfy@ and @unspiderfy@).
+bc. addListener(event, listenerFunc)
+
+Adds a listener to react to one of three events.
+
+@event@ may be @'click'@, @'spiderfy'@ or @'unspiderfy'@.
+
+@listenerFunc@ expects as its single argument a single marker object (@click@) or an array thereof (@spiderfy@ and @unspiderfy@).
 
 h2. Options
 
