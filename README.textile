@@ -11,6 +11,8 @@ I wrote it as part of the data download feature for "Mappiness":http://www.mappi
 
 h2. Demo
 
+<iframe src="http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html"></iframe>
+
 Try it on the (sorry, kind-of-boring) "demo map":http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html.
 
 h2. Usage
