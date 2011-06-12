@@ -3,9 +3,9 @@ Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that ov
 
 And ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing *doesn't* happen?
 
-This code makes Google Maps API map markers behave in that Google Earth way (minus, at least as yet, the snazzy animation).
+This code makes Google Maps API map markers behave in that Google Earth way (minus, at least as yet, the snazzy animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
 
-It has no dependencies (except Google Maps), so you can use it with any library. And it's just 1.7K when CoffeeScript-compiled, minified (with "Google Closure Compiler":http://code.google.com/closure/compiler/) and gzipped.
+The compiled code has no dependencies (except Google Maps), so you can use it with any library. And it's just 1.7K when compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/) and gzipped.
 
 I wrote it as part of the data download feature for "Mappiness":http://www.mappiness.org.uk.
 
@@ -21,7 +21,7 @@ bc. gm = google.maps
 map = new gm.Map(
   document.getElementById('map_canvas'), 
   mapTypeId: gm.MapTypeId.SATELLITE,
-  center: new gm.LatLng(50, 0), zoom: 6  # whatevs: fitBounds will override
+  center: new gm.LatLng(50, 0), zoom: 6
 )
 iw = new gm.InfoWindow()
 
@@ -35,7 +35,7 @@ bc. oms.addListener 'click', (marker) ->
   iw.setContent(marker.desc)
   iw.open(map, marker)
   
-You can also add listeners for the @spiderfy@ and @unspiderfy@ events, which are each passed an array of the markers affected. In this example, we observe only the @spiderfy@ event, using it to close any open InfoWindow:
+You can also add listeners for the @spiderfy@ and @unspiderfy@ events, which are each passed an array of the markers affected. In this example, we observe only the @spiderfy@ event, using it to close any open @InfoWindow@:
   
 bc. oms.addListener 'spiderfy', (markers) -> 
   iw.close()
