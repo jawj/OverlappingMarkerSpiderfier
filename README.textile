@@ -23,7 +23,6 @@ map = new gm.Map(
   mapTypeId: gm.MapTypeId.SATELLITE,
   center: new gm.LatLng(50, 0), zoom: 6
 )
-iw = new gm.InfoWindow()
 
 Create an @OverlappingMarkerSpiderfier@ instance:
 
@@ -31,7 +30,8 @@ bc. oms = new OverlappingMarkerSpiderfier(map)
 
 Instead of adding click listeners to your markers directly via @google.maps.event.addListener@, add a global listener on the @OverlappingMarkerSpiderfier@ instance instead. This listener will be passed the clicked marker as its first argument.
 
-bc. oms.addListener 'click', (marker) ->
+bc. iw = new gm.InfoWindow()
+oms.addListener 'click', (marker) ->
   iw.setContent(marker.desc)
   iw.open(map, marker)
   
