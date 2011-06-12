@@ -1,0 +1,3 @@
+
+* No dependencies (except Google Maps)
+* Just 1.7K when minified with "Google Closure Compiler":http://code.google.com/closure/compiler/ and gzipped
