@@ -19,6 +19,10 @@ h2. Demo
 
 See the (sorry, kinda boring) "demo map":http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html.
 
+h2. Download
+
+Download "the compiled, minified JS source":http://jawj.github.com/OverlappingMarkerSpiderfier/bin/oms.min.js.
+
 h2. How to use
 
 This how-to is in CoffeeScript, but obviously it'll work from plain old regular JavaScript too. 
