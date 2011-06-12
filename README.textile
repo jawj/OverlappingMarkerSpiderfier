@@ -3,7 +3,7 @@ Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that ov
 
 And ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing *doesn't* happen?
 
-This code makes Google Maps API map markers behave in that Google Earth way (minus, at least as yet, the snazzy animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
+This code makes Google Maps API *version 3* map markers behave in that Google Earth way (minus, at least as yet, the snazzy animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
 
 The compiled code has no dependencies (except Google Maps), so you can use it with any library. And it's just 1.7K when compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/) and gzipped.
 
