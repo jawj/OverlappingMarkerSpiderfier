@@ -1,7 +1,7 @@
 
 *Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that overlap each other spring apart gracefully when you click them, so you can pick the one you meant?*
 
-*Ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing doesn't happen?*
+*And ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing doesn't happen?*
 
 This code makes Google Maps API *version 3* map markers behave in that Google Earth way (minus, at least as yet, the snazzy animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
 
