@@ -11,11 +11,9 @@ I wrote it as part of the data download feature for "Mappiness":http://www.mappi
 
 h2. Demo
 
-<iframe src="http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html"></iframe>
-
 Try it on the (sorry, kind-of-boring) "demo map":http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html.
 
-h2. Usage
+h2. Example code
 
 This example is in CoffeeScript. Create your map like normal:
 
@@ -52,7 +50,23 @@ bc. for datum in window.mapData
   marker.desc = datum.d
   oms.addMarker(marker)
 
+h2. Docs
+
+So, in summary:
+
+h3. Construction
+
+bc. new OverlappingMarkerSpiderfier(map)
+
+h3. Instance methods
+
+bc. addMarker(marker)
+
+bc. addListener(listener, listenerFunc)
+
+Where @listener@ is one of @'click'@, @'spiderfy'@ or @'unspiderfy'@ and @listenerFunc@ expects as its single argument a single marker object (@click@) or an array thereof (@spiderfy@ and @unspiderfy@).
+
 h2. Options
 
-There are options for just about everything, but at present you'll need to re-build the CoffeeScript source to set them. This may change in future.
+There are options regarding colours and distances, but at present you'll need to re-build the CoffeeScript source to set them. This may change in future.
 
