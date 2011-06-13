@@ -1,5 +1,5 @@
 /*
- * OverlappingMarkerSpiderfier: 
+ * OverlappingMarkerSpiderfier
  * https://github.com/jawj/OverlappingMarkerSpiderfier
  *
  * Copyright (c) 2011 George MacKerron
