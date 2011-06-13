@@ -20,32 +20,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ###
 
+# Note: string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
+
 gm = google.maps
 twoPi = Math.PI * 2
 
 class OverlappingMarkerSpiderfier
   
-  nearbyDistance: 20           # spiderfy markers within this range of the one clicked, in px
+  'nearbyDistance': 20           # spiderfy markers within this range of the one clicked, in px
   
-  circleFootSeparation: 23     # related to circumference of circle
-  circleStartAngle: twoPi / 12
+  'circleFootSeparation': 23     # related to circumference of circle
+  'circleStartAngle': twoPi / 12
   
-  spiralFootSeparation: 26     # related to size of spiral (experiment!)
-  spiralLengthStart: 11        # ditto
-  spiralLengthFactor: 4        # ditto
+  'spiralFootSeparation': 26     # related to size of spiral (experiment!)
+  'spiralLengthStart': 11        # ditto
+  'spiralLengthFactor': 4        # ditto
   
-  circleSpiralSwitchover: 9    # show spiral instead of circle from this marker count upwards
-                               # 0 -> always spiral; Infinity -> always circle
+  'circleSpiralSwitchover': 9    # show spiral instead of circle from this marker count upwards
+                                 # 0 -> always spiral; Infinity -> always circle
   
-  usualZIndex: 10
-  spiderfiedZIndex: 10000      # ensure spiderfied markers are on top
+  'usualZIndex': 10
+  'spiderfiedZIndex': 10000      # ensure spiderfied markers are on top
   
-  usualLegZIndex: 9
-  highlightedLegZIndex: 9999   # ensure highlighted legs are on top
-  legWeight: 1.5
-  legColors: 
-    usual: {}                  # set at bottom, owing to use of non-literal keys
-    highlighted: {}            # ditto
+  'usualLegZIndex': 9
+  'highlightedLegZIndex': 9999   # ensure highlighted legs are on top
+  'legWeight': 1.5
+  'legColors': 
+    'usual': {}                  # set at bottom, owing to use of non-literal keys
+    'highlighted': {}            # ditto
     
   constructor: (@map) ->
     @projHelper = new @constructor.ProjHelper(@map)
@@ -54,7 +56,7 @@ class OverlappingMarkerSpiderfier
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
       gm.event.addListener(@map, e, => @unspiderfy()) 
     
-  addListener: (event, func) ->  # listeners: click(marker), spiderfy(markers), unspiderfy(markers)
+  'addListener': (event, func) ->  # listeners: click(marker), spiderfy(markers), unspiderfy(markers)
     (@listeners[event] ?= []).push(func)
     this  # return self, for chaining
     
@@ -62,9 +64,9 @@ class OverlappingMarkerSpiderfier
     func(args...) for func in (@listeners[event] ? [])
     this  # return self, for chaining
     
-  addMarker: (marker) ->
+  'addMarker': (marker) ->
     gm.event.addListener(marker, 'click', => @spiderListener(marker))
-    marker.setZIndex(@usualZIndex)
+    marker.setZIndex(@['usualZIndex'])
     @markers.push(marker)
     this  # return self, for chaining
     
@@ -79,22 +81,22 @@ class OverlappingMarkerSpiderfier
     nearby
     
   generatePtsCircle: (count, centerPt) ->
-    circumference = @circleFootSeparation * (2 + count)
+    circumference = @['circleFootSeparation'] * (2 + count)
     legLength = circumference / twoPi  # = radius from circumference
     angleStep = twoPi / count
     for i in [0...count]
-      angle = @circleStartAngle + i * angleStep
+      angle = @['circleStartAngle'] + i * angleStep
       new gm.Point(centerPt.x + legLength * Math.cos(angle), 
                    centerPt.y + legLength * Math.sin(angle))
     
   generatePtsSpiral: (count, centerPt) ->
-    legLength = @spiralLengthStart
+    legLength = @['spiralLengthStart']
     angle = 0
     for i in [0...count]
-      angle += @spiralFootSeparation / legLength + i * 0.0005
+      angle += @['spiralFootSeparation'] / legLength + i * 0.0005
       pt = new gm.Point(centerPt.x + legLength * Math.cos(angle), 
                         centerPt.y + legLength * Math.sin(angle))
-      legLength += twoPi * @spiralLengthFactor / angle
+      legLength += twoPi * @['spiralLengthFactor'] / angle
       pt
     
   spiderListener: (marker) ->
@@ -103,7 +105,7 @@ class OverlappingMarkerSpiderfier
     if markerSpiderfied
       @trigger('click', marker)
     else
-      nearbyMarkerData = @nearbyMarkerData(marker, @nearbyDistance)
+      nearbyMarkerData = @nearbyMarkerData(marker, @['nearbyDistance'])
       if nearbyMarkerData.length == 1  # 1 => the one clicked => none nearby
         @trigger('click', marker)
       else
@@ -112,18 +114,18 @@ class OverlappingMarkerSpiderfier
   makeHighlightListeners: (marker) ->
     highlight: 
       => marker.omsData.leg.setOptions
-        strokeColor: @legColors.highlighted[@map.mapTypeId]
-        zIndex: @highlightedLegZIndex
+        strokeColor: @['legColors']['highlighted'][@map.mapTypeId]
+        zIndex: @['highlightedLegZIndex']
     unhighlight: 
       => marker.omsData.leg.setOptions
-        strokeColor: @legColors.usual[@map.mapTypeId]
-        zIndex: @usualLegZIndex
+        strokeColor: @['legColors']['usual'][@map.mapTypeId]
+        zIndex: @['usualLegZIndex']
   
   spiderfy: (markerData) ->
     @spiderfied = yes
     numFeet = markerData.length
     bodyPt = @ptAverage(md.markerPt for md in markerData)
-    footPts = if numFeet >= @circleSpiralSwitchover 
+    footPts = if numFeet >= @['circleSpiralSwitchover'] 
       @generatePtsSpiral(numFeet, bodyPt).reverse()  # match from outside in => less criss-crossing
     else
       @generatePtsCircle(numFeet, bodyPt)
@@ -135,18 +137,18 @@ class OverlappingMarkerSpiderfier
       leg = new gm.Polyline
         map: @map
         path: [marker.position, footLl]
-        strokeColor: @legColors.usual[@map.mapTypeId]
-        strokeWeight: @legWeight
-        zIndex: @usualLegZIndex
+        strokeColor: @['legColors']['usual'][@map.mapTypeId]
+        strokeWeight: @['legWeight']
+        zIndex: @['usualLegZIndex']
       marker.omsData = 
         usualPosition: marker.position
         leg: leg
-      unless @legColors.highlighted[@map.mapTypeId] == @legColors.usual[@map.mapTypeId]
+      unless @['legColors']['highlighted'][@map.mapTypeId] == @['legColors']['usual'][@map.mapTypeId]
         listeners = @makeHighlightListeners(marker)
         gm.event.addListener(marker, 'mouseover', listeners.highlight)
         gm.event.addListener(marker, 'mouseout', listeners.unhighlight)
         marker.omsData.hightlightListeners = listeners
-      marker.setZIndex(@spiderfiedZIndex + footPt.y)  # lower markers should cover higher ones
+      marker.setZIndex(@['spiderfiedZIndex'] + footPt.y)  # lower markers should cover higher ones
       marker.setPosition(footLl)
       spiderfiedMarkers.push(marker)
     @trigger('spiderfy', spiderfiedMarkers)
@@ -158,7 +160,7 @@ class OverlappingMarkerSpiderfier
     for marker in @markers
       if marker.omsData?
         marker.omsData.leg.setMap(null)
-        marker.setZIndex(@usualZIndex)
+        marker.setZIndex(@['usualZIndex'])
         marker.setPosition(marker.omsData.usualPosition)
         listeners = marker.omsData.hightlightListeners
         if listeners?
@@ -194,27 +196,18 @@ class OverlappingMarkerSpiderfier
 # the ProjHelper object is just used to get the map's projection
 OverlappingMarkerSpiderfier.ProjHelper = (map) -> @setMap(map)
 OverlappingMarkerSpiderfier.ProjHelper.prototype = new gm.OverlayView()
-OverlappingMarkerSpiderfier.ProjHelper.prototype.draw = ->  # dummy function
+OverlappingMarkerSpiderfier.ProjHelper.prototype['draw'] = ->  # dummy function
 
 mt = gm.MapTypeId
-lc = OverlappingMarkerSpiderfier.prototype.legColors
+lc = OverlappingMarkerSpiderfier.prototype['legColors']
+lcU = lc['usual']
+lcH = lc['highlighted']
 
-lc.usual[mt.HYBRID] = lc.usual[mt.SATELLITE] = '#fff'
-lc.highlighted[mt.HYBRID] = lc.highlighted[mt.SATELLITE] = '#f00'
+lcU[mt.HYBRID] = lcU[mt.SATELLITE] = '#fff'
+lcH[mt.HYBRID] = lcH[mt.SATELLITE] = '#f00'
 
-lc.usual[mt.TERRAIN] = lc.usual[mt.ROADMAP] = '#444'
-lc.highlighted[mt.TERRAIN] = lc.highlighted[mt.ROADMAP] = '#f00'
+lcU[mt.TERRAIN] = lcU[mt.ROADMAP] = '#444'
+lcH[mt.TERRAIN] = lcH[mt.ROADMAP] = '#f00'
 
-
-# exports for Closure Compiler ADVANCED_OPTIMIZATION
-omsp = OverlappingMarkerSpiderfier.prototype
-omsp['addMarker'] = omsp.addMarker
-omsp['addListener'] = omsp.addListener
-omsp['nearbyDistance'] = omsp.nearbyDistance
-omsp['legWeight'] = omsp.legWeight
-omsp['legColors'] = omsp.legColors
-omsp.legColors['usual'] = omsp.legColors.usual
-omsp.legColors['highlighted'] = omsp.legColors.highlighted
-OverlappingMarkerSpiderfier.ProjHelper.prototype['draw'] = OverlappingMarkerSpiderfier.ProjHelper.prototype.draw
 this['OverlappingMarkerSpiderfier'] = OverlappingMarkerSpiderfier
 
