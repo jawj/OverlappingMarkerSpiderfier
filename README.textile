@@ -100,5 +100,6 @@ There are various properties you can set on an @OverlappingMarkerSpiderfier@ ins
 
 bc. legColors.usual[google.maps.MapTypeId.HYBRID] = legColors.usual[google.maps.MapTypeId.SATELLITE] = '#fff'
 legColors.usual[google.maps.MapTypeId.TERRAIN] = legColors.usual[google.maps.MapTypeId.ROADMAP] = '#444'
-legColors.highlighted[google.maps.MapTypeId.HYBRID] = legColors.highlighted[google.maps.MapTypeId.SATELLITE] = legColors.highlighted[google.maps.MapTypeId.TERRAIN] = legColors.highlighted[google.maps.MapTypeId.ROADMAP] = '#f00'
+legColors.highlighted[google.maps.MapTypeId.HYBRID] = legColors.highlighted[google.maps.MapTypeId.SATELLITE] = 
+  legColors.highlighted[google.maps.MapTypeId.TERRAIN] = legColors.highlighted[google.maps.MapTypeId.ROADMAP] = '#f00'
 
