@@ -194,8 +194,7 @@ class OverlappingMarkerSpiderfier
 # the ProjHelper object is just used to get the map's projection
 OverlappingMarkerSpiderfier.ProjHelper = (map) -> @setMap(map)
 OverlappingMarkerSpiderfier.ProjHelper.prototype = new gm.OverlayView()
-# dummy function; name set with a string property to protect from compiler
-OverlappingMarkerSpiderfier.ProjHelper.prototype['draw'] = ->
+OverlappingMarkerSpiderfier.ProjHelper.prototype.draw = ->  # dummy function
 
 mt = gm.MapTypeId
 lc = OverlappingMarkerSpiderfier.prototype.legColors
@@ -206,9 +205,16 @@ lc.highlighted[mt.HYBRID] = lc.highlighted[mt.SATELLITE] = '#f00'
 lc.usual[mt.TERRAIN] = lc.usual[mt.ROADMAP] = '#444'
 lc.highlighted[mt.TERRAIN] = lc.highlighted[mt.ROADMAP] = '#f00'
 
+
 # exports for Closure Compiler ADVANCED_OPTIMIZATION
-this['OverlappingMarkerSpiderfier'] = OverlappingMarkerSpiderfier
 omsp = OverlappingMarkerSpiderfier.prototype
 omsp['addMarker'] = omsp.addMarker
 omsp['addListener'] = omsp.addListener
+omsp['nearbyDistance'] = omsp.nearbyDistance
+omsp['legWeight'] = omsp.legWeight
+omsp['legColors'] = omsp.legColors
+omsp.legColors['usual'] = omsp.legColors.usual
+omsp.legColors['highlighted'] = omsp.legColors.highlighted
+OverlappingMarkerSpiderfier.ProjHelper.prototype['draw'] = OverlappingMarkerSpiderfier.ProjHelper.prototype.draw
+this['OverlappingMarkerSpiderfier'] = OverlappingMarkerSpiderfier
 
