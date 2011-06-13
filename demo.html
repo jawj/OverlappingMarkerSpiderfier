@@ -14,43 +14,45 @@
   </style>
   <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
   <script src="bin/oms.min.js"></script>
-  <script type="text/coffeescript">
-  
-    window.onload = ->
-      gm = google.maps
-      map = new gm.Map(
-        document.getElementById('map_canvas'), 
+  <script>
+    window.onload = function() {
+      var gm = google.maps;
+      var map = new gm.Map(document.getElementById('map_canvas'), {
         mapTypeId: gm.MapTypeId.SATELLITE,
-        center: new gm.LatLng(50, 0), zoom: 6  # whatevs: fitBounds will override
-      )
-      iw = new gm.InfoWindow()
-      bounds = new gm.LatLngBounds()
-
-      oms = new OverlappingMarkerSpiderfier(map)
-      oms.addListener 'click', (marker) ->
-        iw.setContent(marker.desc)
-        iw.open(map, marker)
-      oms.addListener 'spiderfy', (markers) -> 
-        iw.close()
-
-      for datum in window.mapData
-        loc = new gm.LatLng(datum.lat, datum.lon)
-        bounds.extend(loc)
-        marker = new gm.Marker 
-          position: loc
-          title: datum.h
-          map: map
-        marker.desc = datum.d
-        oms.addMarker(marker)
-
-      map.fitBounds(bounds)
-
-      # for debugging/exploratory use in console
-      window.map = map
-      window.oms = oms
+        center: new gm.LatLng(50, 0), zoom: 6  // whatevs: fitBounds will override
+      });
       
+      var oms = new OverlappingMarkerSpiderfier(map);
+      
+      var iw = new gm.InfoWindow();
+      oms.addListener('click', function(marker) {
+        iw.setContent(marker.desc);
+        iw.open(map, marker);
+      });
+      oms.addListener('spiderfy', function(markers) {
+        iw.close();
+      });
+      
+      var bounds = new gm.LatLngBounds();
+      for (var i = 0; i < window.mapData.length; i ++) {
+        var datum = window.mapData[i];
+        var loc = new gm.LatLng(datum.lat, datum.lon);
+        bounds.extend(loc);
+        var marker = new gm.Marker({
+          position: loc,
+          title: datum.h,
+          map: map
+        });
+        marker.desc = datum.d;
+        oms.addMarker(marker);
+      }
+      map.fitBounds(bounds);
+
+      // for debugging/exploratory use in console
+      window.map = map;
+      window.oms = oms;
+    }
   </script>
-  <script src="http://jashkenas.github.com/coffee-script/extras/coffee-script.js"></script>
 </head>
 <body><div id="map_canvas"></div></body>
 <script>
