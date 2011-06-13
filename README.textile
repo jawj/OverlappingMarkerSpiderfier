@@ -90,17 +90,15 @@ h3. Properties
 
 There are various properties you can set on an @OverlappingMarkerSpiderfier@ instance. The most useful are probably:
 
-@nearbyDistance@, which is the pixel radius within which a marker is considered to be overlapping a clicked marker. Default: 20.
+@nearbyDistance@, which is the pixel radius within which a marker is considered to be overlapping a clicked marker. Default: @20@.
 
-@circleSpiralSwitchover@, which is the lowest number of markers that will be fanned out into a spiral instead of a circle. Default: 9. Set this to 0 to always get spirals, or Infinity for all circles.
+@circleSpiralSwitchover@, which is the lowest number of markers that will be fanned out into a spiral instead of a circle. Set this to @0@ to always get spirals, or @Infinity@ for all circles. Default: @9@.
 
-@legWeight@, which determines the thickness of the lines joining spiderfied markers to their original locations. Default: 1.5.
+@legWeight@, which determines the thickness of the lines joining spiderfied markers to their original locations. Default: @1.5@.
 
 @legColors.usual[mapType]@ and @legColors.highlighted[mapType]@, which determine the usual and highlighted colours of those lines, where mapType is one of the @google.maps.MapTypeId@ constants. Defaults:
 
-@legColors.usual[google.maps.MapTypeId.HYBRID] = legColors.usual[google.maps.MapTypeId.SATELLITE] = '#fff'@
-
-@legColors.usual[google.maps.MapTypeId.TERRAIN] = legColors.usual[google.maps.MapTypeId.ROADMAP] = '#444'@
-
-@legColors.highlighted[google.maps.MapTypeId.HYBRID] = legColors.highlighted[google.maps.MapTypeId.SATELLITE] = legColors.highlighted[google.maps.MapTypeId.TERRAIN] = legColors.highlighted[google.maps.MapTypeId.ROADMAP] = '#f00'@
+bc. legColors.usual[google.maps.MapTypeId.HYBRID] = legColors.usual[google.maps.MapTypeId.SATELLITE] = '#fff'
+legColors.usual[google.maps.MapTypeId.TERRAIN] = legColors.usual[google.maps.MapTypeId.ROADMAP] = '#444'
+legColors.highlighted[google.maps.MapTypeId.HYBRID] = legColors.highlighted[google.maps.MapTypeId.SATELLITE] = legColors.highlighted[google.maps.MapTypeId.TERRAIN] = legColors.highlighted[google.maps.MapTypeId.ROADMAP] = '#f00'
 
