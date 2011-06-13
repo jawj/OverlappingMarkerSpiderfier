@@ -25,42 +25,48 @@ Download "the compiled, minified JS source":http://jawj.github.com/OverlappingMa
 
 h2. How to use
 
-This how-to is in CoffeeScript, but obviously it'll work from plain old regular JavaScript too. 
-
 Create your map like normal:
 
-bc. gm = google.maps
-map = new gm.Map(
-  document.getElementById('map_canvas'), 
+bc. var gm = google.maps;
+var map = new gm.Map(document.getElementById('map_canvas'), {
   mapTypeId: gm.MapTypeId.SATELLITE,
-  center: new gm.LatLng(50, 0), zoom: 6
-)
+  center: new gm.LatLng(50, 0), zoom: 6  // whatevs: fitBounds will override
+});
 
 Create an @OverlappingMarkerSpiderfier@ instance:
 
-bc. oms = new OverlappingMarkerSpiderfier(map)
+bc. var oms = new OverlappingMarkerSpiderfier(map);
 
 Instead of adding click listeners to your markers directly via @google.maps.event.addListener@, add a global listener on the @OverlappingMarkerSpiderfier@ instance instead. The listener will be passed the clicked marker as its first argument.
 
-bc. iw = new gm.InfoWindow()
-oms.addListener 'click', (marker) ->
-  iw.setContent(marker.desc)
-  iw.open(map, marker)
+bc. var iw = new gm.InfoWindow();
+oms.addListener('click', function(marker) {
+  iw.setContent(marker.desc);
+  iw.open(map, marker);
+});
   
 You can also add listeners on the @spiderfy@ and @unspiderfy@ events, which will be passed an array of the markers affected. In this example, we observe only the @spiderfy@ event, using it to close any open @InfoWindow@:
   
-bc. oms.addListener 'spiderfy', (markers) -> 
-  iw.close()
+bc. oms.addListener('spiderfy', function(markers) {
+  iw.close();
+});
 
 Finally, tell the @OverlappingMarkerSpiderfier@ instance about each marker as you add it:
 
-bc. for datum in window.mapData
-  marker = new gm.Marker 
-    position: new gm.LatLng(datum.lat, datum.lon)
-    title: datum.h
+bc. var bounds = new gm.LatLngBounds();
+for (var i = 0; i < window.mapData.length; i ++) {
+  var datum = window.mapData[i];
+  var loc = new gm.LatLng(datum.lat, datum.lon);
+  bounds.extend(loc);
+  var marker = new gm.Marker({
+    position: loc,
+    title: datum.h,
     map: map
-  marker.desc = datum.d
-  oms.addMarker(marker)
+  });
+  marker.desc = datum.d;
+  oms.addMarker(marker);
+}
+map.fitBounds(bounds);
 
 h2. Docs
 
