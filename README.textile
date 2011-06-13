@@ -5,7 +5,7 @@
 
 This code makes Google Maps API *version 3* map markers behave in that Google Earth way (minus, at least as yet, the snazzy animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
 
-The compiled code has no dependencies (except Google Maps), so you can use it with any library. And it's just 1.7K when compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/) and gzipped.
+The compiled code has no dependencies (except Google Maps), so you can use it with any library. And it's just 2K when compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/) and gzipped.
 
 I wrote it as part of the data download feature for "Mappiness":http://www.mappiness.org.uk.
 
@@ -86,7 +86,21 @@ Adds a listener to react to one of three events.
 
 @listenerFunc@ will receive as its argument a single marker object (@click@) or an array thereof (@spiderfy@ and @unspiderfy@).
 
-h2. Options
+h3. Properties
 
-There are options regarding colours and distances, but at present you'll need to re-build the CoffeeScript source to set them. This may change in future.
+There are various properties you can set on an @OverlappingMarkerSpiderfier@ instance. The most useful are probably:
+
+@nearbyDistance@, which is the pixel radius within which a marker is considered to be overlapping a clicked marker. Default: 20.
+
+@circleSpiralSwitchover@, which is the lowest number of markers that will be fanned out into a spiral instead of a circle. Default: 9. Set this to 0 to always get spirals, or Infinity for all circles.
+
+@legWeight@, which determines the thickness of the lines joining spiderfied markers to their original locations. Default: 1.5.
+
+@legColors.usual[mapType]@ and @legColors.highlighted[mapType]@, which determine the usual and highlighted colours of those lines, where mapType is one of the @google.maps.MapTypeId@ constants. Defaults:
+
+@legColors.usual[google.maps.MapTypeId.HYBRID] = legColors.usual[google.maps.MapTypeId.SATELLITE] = '#fff'@
+
+@legColors.usual[google.maps.MapTypeId.TERRAIN] = legColors.usual[google.maps.MapTypeId.ROADMAP] = '#444'@
+
+@legColors.highlighted[google.maps.MapTypeId.HYBRID] = legColors.highlighted[google.maps.MapTypeId.SATELLITE] = legColors.highlighted[google.maps.MapTypeId.TERRAIN] = legColors.highlighted[google.maps.MapTypeId.ROADMAP] = '#f00'@
 
