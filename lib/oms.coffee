@@ -22,54 +22,66 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # Note: string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
 
-gm = google.maps
-twoPi = Math.PI * 2
-
-class OverlappingMarkerSpiderfier
+class this['OverlappingMarkerSpiderfier']
+  
+  gm = google.maps
+  mt = gm.MapTypeId
+  twoPi = Math.PI * 2
+  
+  'VERSION': '0.1'
   
   'nearbyDistance': 20           # spiderfy markers within this range of the one clicked, in px
   
+  'circleSpiralSwitchover': 9    # show spiral instead of circle from this marker count upwards
+                                 # 0 -> always spiral; Infinity -> always circle
   'circleFootSeparation': 23     # related to circumference of circle
   'circleStartAngle': twoPi / 12
-  
   'spiralFootSeparation': 26     # related to size of spiral (experiment!)
   'spiralLengthStart': 11        # ditto
   'spiralLengthFactor': 4        # ditto
   
-  'circleSpiralSwitchover': 9    # show spiral instead of circle from this marker count upwards
-                                 # 0 -> always spiral; Infinity -> always circle
-  
-  'usualZIndex': 10
+  'usualZIndex': 10              # for markers
   'spiderfiedZIndex': 10000      # ensure spiderfied markers are on top
+  'usualLegZIndex': 9            # for legs
+  'highlightedLegZIndex': 9999   # ensure highlighted leg is always on top
   
-  'usualLegZIndex': 9
-  'highlightedLegZIndex': 9999   # ensure highlighted legs are on top
   'legWeight': 1.5
-  'legColors': 
-    'usual': {}                  # set at bottom, owing to use of non-literal keys
-    'highlighted': {}            # ditto
-    
+  'legColors':
+    'usual': {}
+    'highlighted': {}
+  
+  lcU = @::['legColors']['usual']
+  lcH = @::['legColors']['highlighted']
+  lcU[mt.HYBRID]  = lcU[mt.SATELLITE] = '#fff'
+  lcH[mt.HYBRID]  = lcH[mt.SATELLITE] = '#f00'
+  lcU[mt.TERRAIN] = lcU[mt.ROADMAP]   = '#444'
+  lcH[mt.TERRAIN] = lcH[mt.ROADMAP]   = '#f00'
+  
+  
+  # Note: it's OK that this constructor comes after the properties, because a function defined by a 
+  # function declaration can be used before the function declaration itself
   constructor: (@map) ->
     @projHelper = new @constructor.ProjHelper(@map)
     @markers = []
     @listeners = {}
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
       gm.event.addListener(@map, e, => @unspiderfy()) 
-    
-  'addListener': (event, func) ->  # listeners: click(marker), spiderfy(markers), unspiderfy(markers)
+  
+  # available listeners: click(marker), spiderfy(markers), unspiderfy(markers)
+  'addListener': (event, func) ->
     (@listeners[event] ?= []).push(func)
     this  # return self, for chaining
-    
+  
   trigger: (event, args...) ->
     func(args...) for func in (@listeners[event] ? [])
     this  # return self, for chaining
-    
+  
   'addMarker': (marker) ->
     gm.event.addListener(marker, 'click', => @spiderListener(marker))
     marker.setZIndex(@['usualZIndex'])
     @markers.push(marker)
     this  # return self, for chaining
-    
+  
   nearbyMarkerData: (marker, px) ->
     nearby = []
     pxSq = px * px
@@ -79,7 +91,7 @@ class OverlappingMarkerSpiderfier
       if @ptDistanceSq(mPt, markerPt) < pxSq
         nearby.push(marker: m, markerPt: mPt)
     nearby
-    
+  
   generatePtsCircle: (count, centerPt) ->
     circumference = @['circleFootSeparation'] * (2 + count)
     legLength = circumference / twoPi  # = radius from circumference
@@ -88,7 +100,7 @@ class OverlappingMarkerSpiderfier
       angle = @['circleStartAngle'] + i * angleStep
       new gm.Point(centerPt.x + legLength * Math.cos(angle), 
                    centerPt.y + legLength * Math.sin(angle))
-    
+  
   generatePtsSpiral: (count, centerPt) ->
     legLength = @['spiralLengthStart']
     angle = 0
@@ -98,7 +110,7 @@ class OverlappingMarkerSpiderfier
                         centerPt.y + legLength * Math.sin(angle))
       legLength += twoPi * @['spiralLengthFactor'] / angle
       pt
-    
+  
   spiderListener: (marker) ->
     markerSpiderfied = marker.omsData?
     @unspiderfy()
@@ -143,7 +155,8 @@ class OverlappingMarkerSpiderfier
       marker.omsData = 
         usualPosition: marker.position
         leg: leg
-      unless @['legColors']['highlighted'][@map.mapTypeId] == @['legColors']['usual'][@map.mapTypeId]
+      unless @['legColors']['highlighted'][@map.mapTypeId] ==
+             @['legColors']['usual'][@map.mapTypeId]
         listeners = @makeHighlightListeners(marker)
         gm.event.addListener(marker, 'mouseover', listeners.highlight)
         gm.event.addListener(marker, 'mouseout', listeners.unhighlight)
@@ -152,7 +165,7 @@ class OverlappingMarkerSpiderfier
       marker.setPosition(footLl)
       spiderfiedMarkers.push(marker)
     @trigger('spiderfy', spiderfiedMarkers)
-    
+  
   unspiderfy: ->
     return unless @spiderfied?
     delete @spiderfied
@@ -169,18 +182,18 @@ class OverlappingMarkerSpiderfier
         delete marker.omsData
         unspiderfiedMarkers.push(marker)
     @trigger('unspiderfy', unspiderfiedMarkers)
-    
+  
   ptDistanceSq: (pt1, pt2) -> 
     dx = pt1.x - pt2.x; dy = pt1.y - pt2.y
     dx * dx + dy * dy
-    
+  
   ptAverage: (pts) ->
     sumX = sumY = 0
     for pt in pts
       sumX += pt.x; sumY += pt.y
     numPts = pts.length
     new gm.Point(sumX / numPts, sumY / numPts)
-    
+  
   llToPt: (ll) -> @projHelper.getProjection().fromLatLngToDivPixel(ll)
   
   ptToLl: (ll) -> @projHelper.getProjection().fromDivPixelToLatLng(ll)
@@ -192,22 +205,8 @@ class OverlappingMarkerSpiderfier
         bestVal = val
         bestIndex = index
     set.splice(bestIndex, 1)[0]
-
-# the ProjHelper object is just used to get the map's projection
-OverlappingMarkerSpiderfier.ProjHelper = (map) -> @setMap(map)
-OverlappingMarkerSpiderfier.ProjHelper.prototype = new gm.OverlayView()
-OverlappingMarkerSpiderfier.ProjHelper.prototype['draw'] = ->  # dummy function
-
-mt = gm.MapTypeId
-lc = OverlappingMarkerSpiderfier.prototype['legColors']
-lcU = lc['usual']
-lcH = lc['highlighted']
-
-lcU[mt.HYBRID] = lcU[mt.SATELLITE] = '#fff'
-lcH[mt.HYBRID] = lcH[mt.SATELLITE] = '#f00'
-
-lcU[mt.TERRAIN] = lcU[mt.ROADMAP] = '#444'
-lcH[mt.TERRAIN] = lcH[mt.ROADMAP] = '#f00'
-
-this['OverlappingMarkerSpiderfier'] = OverlappingMarkerSpiderfier
-
+  
+  # the ProjHelper object is just used to get the map's projection
+  @ProjHelper = (map) -> @setMap(map)
+  @ProjHelper:: = new gm.OverlayView()
+  @ProjHelper::['draw'] = ->  # dummy function
