@@ -53,7 +53,7 @@ bc. oms.addListener('spiderfy', function(markers) {
   iw.close();
 });
 
-Finally, tell the @OverlappingMarkerSpiderfier@ instance about each marker as you add it:
+Finally, tell the @OverlappingMarkerSpiderfier@ instance about each marker as you add it, using the @addMarker@ method:
 
 bc. var bounds = new gm.LatLngBounds();
 for (var i = 0; i < window.mapData.length; i ++) {
@@ -66,7 +66,7 @@ for (var i = 0; i < window.mapData.length; i ++) {
     map: map
   });
   marker.desc = datum.d;
-  oms.addMarker(marker);
+  oms.addMarker(marker);  // <-- here
 }
 map.fitBounds(bounds);
 
@@ -104,7 +104,7 @@ There are various properties you can set on an @OverlappingMarkerSpiderfier@ ins
 
 @legWeight@, which determines the thickness of the lines joining spiderfied markers to their original locations. Default: @1.5@.
 
-@legColors.usual[mapType]@ and @legColors.highlighted[mapType]@, which determine the usual and highlighted colours of those lines, where mapType is one of the @google.maps.MapTypeId@ constants. Defaults:
+@legColors.usual[mapType]@ and @legColors.highlighted[mapType]@, which determine the usual and highlighted colours of those lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants. Defaults:
 
 bc. legColors.usual[google.maps.MapTypeId.HYBRID] = legColors.usual[google.maps.MapTypeId.SATELLITE] = '#fff'
 legColors.usual[google.maps.MapTypeId.TERRAIN] = legColors.usual[google.maps.MapTypeId.ROADMAP] = '#444'
