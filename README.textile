@@ -17,7 +17,7 @@ That might be what you want. However, it probably *isn't* what you want if you h
 
 h2. Demo
 
-See the (sorry, kinda boring) "demo map":http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html.
+See the "demo map":http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html (the data is random: reload the map to reposition the markers).
 
 h2. Download
 
