@@ -1,4 +1,3 @@
-
 *Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that overlap each other spring apart gracefully when you click them, so you can pick the one you meant?*
 
 *And ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing doesn't happen?*
@@ -111,3 +110,6 @@ legColors.usual[google.maps.MapTypeId.TERRAIN] = legColors.usual[google.maps.Map
 legColors.highlighted[google.maps.MapTypeId.HYBRID] = legColors.highlighted[google.maps.MapTypeId.SATELLITE] = 
   legColors.highlighted[google.maps.MapTypeId.TERRAIN] = legColors.highlighted[google.maps.MapTypeId.ROADMAP] = '#f00'
 
+h2. Licence
+
+This software is released under the "MIT licence":http://www.opensource.org/licenses/mit-license.php.
