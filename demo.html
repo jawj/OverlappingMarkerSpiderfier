@@ -21,16 +21,31 @@
         mapTypeId: gm.MapTypeId.SATELLITE,
         center: new gm.LatLng(50, 0), zoom: 6  // whatevs: fitBounds will override
       });
-      
-      var oms = new OverlappingMarkerSpiderfier(map);
-      
       var iw = new gm.InfoWindow();
+      var oms = new OverlappingMarkerSpiderfier(map);
+
+      var usualColor = 'eebb22';
+      var spiderfiedColor = 'ffee22';
+      var iconWithColor = function(color) {
+        return 'http://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin|+|' + color + '|000000|ffff00';
+      }
+      var shadow = new gm.MarkerImage(
+        'https://www.google.com/intl/en_ALL/mapfiles/shadow50.png',
+        new gm.Size(37, 34),  // size   - for sprite clipping
+        new gm.Point(0, 0),   // origin - ditto
+        new gm.Point(10, 34)  // anchor - where to meet map location
+      );
+      
       oms.addListener('click', function(marker) {
         iw.setContent(marker.desc);
         iw.open(map, marker);
       });
       oms.addListener('spiderfy', function(markers) {
+        for(var i = 0; i < markers.length; i ++) markers[i].setIcon(iconWithColor(spiderfiedColor));
         iw.close();
+      });
+      oms.addListener('unspiderfy', function(markers) {
+        for(var i = 0; i < markers.length; i ++) markers[i].setIcon(iconWithColor(usualColor));
       });
       
       var bounds = new gm.LatLngBounds();
@@ -41,7 +56,9 @@
         var marker = new gm.Marker({
           position: loc,
           title: datum.h,
-          map: map
+          map: map,
+          icon: iconWithColor(usualColor),
+          shadow: shadow
         });
         marker.desc = datum.d;
         oms.addMarker(marker);
@@ -61,7 +78,7 @@
   var clusterJitterMax = 0.1;
   var rnd = Math.random;
   var data = [];
-  var clusterSizes = [1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 12, 24, 36, 48];
+  var clusterSizes = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2,2, 3, 3, 4, 5, 6, 7, 8, 9, 12, 18, 24];
   for (var i = 0; i < clusterSizes.length; i++) {
     var baseLon = -1 - baseJitter / 2 + rnd() * baseJitter;
     var baseLat = 52 - baseJitter / 2 + rnd() * baseJitter;
