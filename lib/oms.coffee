@@ -8,7 +8,7 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
 
 class this['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1'
+  p['VERSION'] = '0.1.1'
   
   ###* @const ### gm = google.maps
   ###* @const ### mt = gm.MapTypeId
@@ -24,10 +24,9 @@ class this['OverlappingMarkerSpiderfier']
   p['spiralLengthStart'] = 11        # ditto
   p['spiralLengthFactor'] = 4        # ditto
   
-  p['usualZIndex'] = 10              # for markers
-  p['spiderfiedZIndex'] = 10000      # ensure spiderfied markers are on top
-  p['usualLegZIndex'] = 9            # for legs
-  p['highlightedLegZIndex'] = 9999   # ensure highlighted leg is always on top
+  p['spiderfiedZIndex'] = 1000       # ensure spiderfied markers are on top
+  p['usualLegZIndex'] = 10           # for legs
+  p['highlightedLegZIndex'] = 20     # ensure highlighted leg is always on top
   
   p['legWeight'] = 1.5
   p['legColors'] =
@@ -52,7 +51,6 @@ class this['OverlappingMarkerSpiderfier']
 
   p['addMarker'] = (marker) ->
     gm.event.addListener(marker, 'click', => @spiderListener(marker))
-    marker.setZIndex(@['usualZIndex'])
     @markers.push(marker)
     this  # return self, for chaining
         
@@ -143,8 +141,8 @@ class this['OverlappingMarkerSpiderfier']
         gm.event.addListener(marker, 'mouseover', listeners.highlight)
         gm.event.addListener(marker, 'mouseout', listeners.unhighlight)
         marker.omsData.hightlightListeners = listeners
-      marker.setZIndex(@['spiderfiedZIndex'] + footPt.y)  # lower markers should cover higher ones
       marker.setPosition(footLl)
+      marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # lower markers should cover higher ones
       spiderfiedMarkers.push(marker)
     @trigger('spiderfy', spiderfiedMarkers)
   
@@ -155,8 +153,8 @@ class this['OverlappingMarkerSpiderfier']
     for marker in @markers
       if marker.omsData?
         marker.omsData.leg.setMap(null)
-        marker.setZIndex(@['usualZIndex'])
         marker.setPosition(marker.omsData.usualPosition)
+        marker.setZIndex(null)
         listeners = marker.omsData.hightlightListeners
         if listeners?
           gm.event.clearListeners(marker, 'mouseover', listeners.highlight)

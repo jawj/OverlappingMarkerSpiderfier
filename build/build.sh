@@ -19,3 +19,4 @@ java -jar ~/bin/closure-compiler.jar \
 echo '/*' $(date) '*/' >> $OUTFILE
 
 cp $OUTFILE ../../gh-pages/bin
+cp ${OUTDIR}${INPREFIX}.js ../../gh-pages/bin
