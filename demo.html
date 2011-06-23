@@ -12,7 +12,7 @@
     #map_canvas { height: auto; position: absolute; bottom: 0; left: 0; right: 0; top: 0; }
     @media print { #map_canvas { height: 950px; } }
   </style>
-  <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
+  <script src="http://maps.google.com/maps/api/js?v=3.3&amp;sensor=false"></script>
   <script src="bin/oms.min.js"></script>
   <script>
     window.onload = function() {
@@ -41,11 +41,17 @@
         iw.open(map, marker);
       });
       oms.addListener('spiderfy', function(markers) {
-        for(var i = 0; i < markers.length; i ++) markers[i].setIcon(iconWithColor(spiderfiedColor));
+        for(var i = 0; i < markers.length; i ++) {
+          markers[i].setIcon(iconWithColor(spiderfiedColor));
+          markers[i].setShadow(null);
+        } 
         iw.close();
       });
       oms.addListener('unspiderfy', function(markers) {
-        for(var i = 0; i < markers.length; i ++) markers[i].setIcon(iconWithColor(usualColor));
+        for(var i = 0; i < markers.length; i ++) {
+          markers[i].setIcon(iconWithColor(usualColor));
+          markers[i].setShadow(shadow);
+        }
       });
       
       var bounds = new gm.LatLngBounds();
