@@ -22,6 +22,8 @@ h2. Download
 
 Download "the compiled, minified JS source":http://jawj.github.com/OverlappingMarkerSpiderfier/bin/oms.min.js.
 
+Note: I recommend you use API version 3.3. At the time of writing, versions 3.4 and 3.5 appear to have broken handling of marker z-indices.
+
 h2. How to use
 
 See the "demo map source":/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo.html, or follow along here for a slightly simpler usage with commentary.
