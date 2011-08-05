@@ -99,6 +99,10 @@ Adds a listener to react to one of three events.
 
 @listenerFunc@ will receive as its argument a single marker object (@click@) or an array thereof (@spiderfy@ and @unspiderfy@).
 
+bc. unspiderfy()
+
+Returns any spiderfied markers to their original positions. You can safely call this anytime -- if no markers are spiderfied, nothing will happen.
+
 h3. Properties
 
 There are various properties you can set on an @OverlappingMarkerSpiderfier@ instance. The most useful are probably:

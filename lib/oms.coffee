@@ -8,7 +8,7 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
 
 class this['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1.2'
+  p['VERSION'] = '0.1.3'
   
   ###* @const ### gm = google.maps
   ###* @const ### mt = gm.MapTypeId
@@ -48,7 +48,7 @@ class this['OverlappingMarkerSpiderfier']
     @markers = []
     @listeners = {}
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
-      gm.event.addListener(@map, e, => @unspiderfy()) 
+      gm.event.addListener(@map, e, => @['unspiderfy']()) 
 
   p['addMarker'] = (marker) ->
     listenerRef = gm.event.addListener(marker, 'click', => @spiderListener(marker))
@@ -57,7 +57,7 @@ class this['OverlappingMarkerSpiderfier']
     this  # return self, for chaining
     
   p['removeMarker'] = (marker) ->
-    @unspiderfy() if marker.omsData?  # otherwise it'll be stuck there forever!
+    @['unspiderfy']() if marker.omsData?  # otherwise it'll be stuck there forever!
     i = @arrIndexOf(@markers, marker)
     return if i < 0
     listenerRef = @markerListenerRefs.splice(i, 1)[0]
@@ -104,7 +104,7 @@ class this['OverlappingMarkerSpiderfier']
   
   p.spiderListener = (marker) ->
     markerSpiderfied = marker.omsData?
-    @unspiderfy()
+    @['unspiderfy']()
     if markerSpiderfied
       @trigger('click', marker)
     else
@@ -132,8 +132,7 @@ class this['OverlappingMarkerSpiderfier']
       @generatePtsSpiral(numFeet, bodyPt).reverse()  # match from outside in => less criss-crossing
     else
       @generatePtsCircle(numFeet, bodyPt)
-    spiderfiedMarkers = []
-    for footPt in footPts
+    spiderfiedMarkers = for footPt in footPts
       footLl = @ptToLl(footPt)
       nearestMarkerDatum = @minExtract(markerData, (md) => @ptDistanceSq(md.markerPt, footPt))
       marker = nearestMarkerDatum.marker
@@ -154,10 +153,10 @@ class this['OverlappingMarkerSpiderfier']
         marker.omsData.hightlightListeners = listeners
       marker.setPosition(footLl)
       marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # so lower markers cover higher ones
-      spiderfiedMarkers.push(marker)
+      marker
     @trigger('spiderfy', spiderfiedMarkers)
   
-  p.unspiderfy = ->
+  p['unspiderfy'] = ->
     return unless @spiderfied?
     delete @spiderfied
     unspiderfiedMarkers = []
