@@ -8,7 +8,7 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
 
 class this['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1.1'
+  p['VERSION'] = '0.1.2'
   
   ###* @const ### gm = google.maps
   ###* @const ### mt = gm.MapTypeId
@@ -44,14 +44,25 @@ class this['OverlappingMarkerSpiderfier']
   # function declaration can be used before the function declaration itself
   constructor: (@map) ->
     @projHelper = new @constructor.ProjHelper(@map)
+    @markerListenerRefs = []
     @markers = []
     @listeners = {}
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
       gm.event.addListener(@map, e, => @unspiderfy()) 
 
   p['addMarker'] = (marker) ->
-    gm.event.addListener(marker, 'click', => @spiderListener(marker))
+    listenerRef = gm.event.addListener(marker, 'click', => @spiderListener(marker))
+    @markerListenerRefs.push(listenerRef)
     @markers.push(marker)
+    this  # return self, for chaining
+    
+  p['removeMarker'] = (marker) ->
+    @unspiderfy()
+    i = @arrIndexOf(@markers, marker)
+    return if i < 0
+    listenerRef = @markerListenerRefs.splice(i, 1)[0]
+    gm.event.removeListener(listenerRef)
+    @markers.splice(i, 1)
     this  # return self, for chaining
         
   # available listeners: click(marker), spiderfy(markers), unspiderfy(markers)
@@ -142,7 +153,7 @@ class this['OverlappingMarkerSpiderfier']
         gm.event.addListener(marker, 'mouseout', listeners.unhighlight)
         marker.omsData.hightlightListeners = listeners
       marker.setPosition(footLl)
-      marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # lower markers should cover higher ones
+      marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # so lower markers cover higher ones
       spiderfiedMarkers.push(marker)
     @trigger('spiderfy', spiderfiedMarkers)
   
@@ -185,6 +196,11 @@ class this['OverlappingMarkerSpiderfier']
         bestVal = val
         bestIndex = index
     set.splice(bestIndex, 1)[0]
+    
+  p.arrIndexOf = (arr, obj) -> 
+    return arr.indexOf(obj) if arr.indexOf?
+    (return i if o == obj) for o, i in arr
+    -1
   
   # the ProjHelper object is just used to get the map's projection
   @ProjHelper = (map) -> @setMap(map)
