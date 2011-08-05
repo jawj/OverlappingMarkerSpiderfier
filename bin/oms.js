@@ -61,7 +61,9 @@
     };
     p['removeMarker'] = function(marker) {
       var i, listenerRef;
-      this.unspiderfy();
+      if (marker.omsData != null) {
+        this.unspiderfy();
+      }
       i = this.arrIndexOf(this.markers, marker);
       if (i < 0) {
         return;
