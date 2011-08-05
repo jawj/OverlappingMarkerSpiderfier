@@ -57,7 +57,7 @@ class this['OverlappingMarkerSpiderfier']
     this  # return self, for chaining
     
   p['removeMarker'] = (marker) ->
-    @unspiderfy()
+    @unspiderfy() if marker.omsData?  # otherwise it'll be stuck there forever!
     i = @arrIndexOf(@markers, marker)
     return if i < 0
     listenerRef = @markerListenerRefs.splice(i, 1)[0]
