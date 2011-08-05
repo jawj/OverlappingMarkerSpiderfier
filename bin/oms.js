@@ -7,7 +7,7 @@
   this['OverlappingMarkerSpiderfier'] = (function() {
     var gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.1.1';
+    p['VERSION'] = '0.1.2';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -39,6 +39,7 @@
       var e, _i, _len, _ref;
       this.map = map;
       this.projHelper = new this.constructor.ProjHelper(this.map);
+      this.markerListenerRefs = [];
       this.markers = [];
       this.listeners = {};
       _ref = ['click', 'zoom_changed', 'maptypeid_changed'];
@@ -50,10 +51,24 @@
       }
     }
     p['addMarker'] = function(marker) {
-      gm.event.addListener(marker, 'click', __bind(function() {
+      var listenerRef;
+      listenerRef = gm.event.addListener(marker, 'click', __bind(function() {
         return this.spiderListener(marker);
       }, this));
+      this.markerListenerRefs.push(listenerRef);
       this.markers.push(marker);
+      return this;
+    };
+    p['removeMarker'] = function(marker) {
+      var i, listenerRef;
+      this.unspiderfy();
+      i = this.arrIndexOf(this.markers, marker);
+      if (i < 0) {
+        return;
+      }
+      listenerRef = this.markerListenerRefs.splice(i, 1)[0];
+      gm.event.removeListener(listenerRef);
+      this.markers.splice(i, 1);
       return this;
     };
     p['addListener'] = function(event, func) {
@@ -250,6 +265,19 @@
         }
       }
       return set.splice(bestIndex, 1)[0];
+    };
+    p.arrIndexOf = function(arr, obj) {
+      var i, o, _len;
+      if (arr.indexOf != null) {
+        return arr.indexOf(obj);
+      }
+      for (i = 0, _len = arr.length; i < _len; i++) {
+        o = arr[i];
+        if (o === obj) {
+          return i;
+        }
+      }
+      return -1;
     };
     _Class.ProjHelper = function(map) {
       return this.setMap(map);
