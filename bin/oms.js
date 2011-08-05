@@ -2,12 +2,12 @@
   /** @preserve OverlappingMarkerSpiderfier
   https://github.com/jawj/OverlappingMarkerSpiderfier
   Copyright (c) 2011 George MacKerron
-  Released under the MIT licence: http://opensource.org/licenses/mit-license 
+  Released under the MIT licence: http://opensource.org/licenses/mit-license
   */  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   this['OverlappingMarkerSpiderfier'] = (function() {
     var gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.1.2';
+    p['VERSION'] = '0.1.3';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -46,7 +46,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         e = _ref[_i];
         gm.event.addListener(this.map, e, __bind(function() {
-          return this.unspiderfy();
+          return this['unspiderfy']();
         }, this));
       }
     }
@@ -62,7 +62,7 @@
     p['removeMarker'] = function(marker) {
       var i, listenerRef;
       if (marker.omsData != null) {
-        this.unspiderfy();
+        this['unspiderfy']();
       }
       i = this.arrIndexOf(this.markers, marker);
       if (i < 0) {
@@ -113,7 +113,7 @@
       legLength = circumference / twoPi;
       angleStep = twoPi / count;
       _results = [];
-      for (i = 0; 0 <= count ? i < count : i > count; 0 <= count ? i++ : i--) {
+      for (i = 0; (0 <= count ? i < count : i > count); (0 <= count ? i += 1 : i -= 1)) {
         angle = this['circleStartAngle'] + i * angleStep;
         _results.push(new gm.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle)));
       }
@@ -124,7 +124,7 @@
       legLength = this['spiralLengthStart'];
       angle = 0;
       _results = [];
-      for (i = 0; 0 <= count ? i < count : i > count; 0 <= count ? i++ : i--) {
+      for (i = 0; (0 <= count ? i < count : i > count); (0 <= count ? i += 1 : i -= 1)) {
         angle += this['spiralFootSeparation'] / legLength + i * 0.0005;
         pt = new gm.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle));
         legLength += twoPi * this['spiralLengthFactor'] / angle;
@@ -135,7 +135,7 @@
     p.spiderListener = function(marker) {
       var markerSpiderfied, nearbyMarkerData;
       markerSpiderfied = marker.omsData != null;
-      this.unspiderfy();
+      this['unspiderfy']();
       if (markerSpiderfied) {
         return this.trigger('click', marker);
       } else {
@@ -164,7 +164,7 @@
       };
     };
     p.spiderfy = function(markerData) {
-      var bodyPt, footLl, footPt, footPts, leg, listeners, marker, md, nearestMarkerDatum, numFeet, spiderfiedMarkers, _i, _len;
+      var bodyPt, footLl, footPt, footPts, leg, listeners, marker, md, nearestMarkerDatum, numFeet, spiderfiedMarkers;
       this.spiderfied = true;
       numFeet = markerData.length;
       bodyPt = this.ptAverage((function() {
@@ -177,38 +177,42 @@
         return _results;
       })());
       footPts = numFeet >= this['circleSpiralSwitchover'] ? this.generatePtsSpiral(numFeet, bodyPt).reverse() : this.generatePtsCircle(numFeet, bodyPt);
-      spiderfiedMarkers = [];
-      for (_i = 0, _len = footPts.length; _i < _len; _i++) {
-        footPt = footPts[_i];
-        footLl = this.ptToLl(footPt);
-        nearestMarkerDatum = this.minExtract(markerData, __bind(function(md) {
-          return this.ptDistanceSq(md.markerPt, footPt);
-        }, this));
-        marker = nearestMarkerDatum.marker;
-        leg = new gm.Polyline({
-          map: this.map,
-          path: [marker.position, footLl],
-          strokeColor: this['legColors']['usual'][this.map.mapTypeId],
-          strokeWeight: this['legWeight'],
-          zIndex: this['usualLegZIndex']
-        });
-        marker.omsData = {
-          usualPosition: marker.position,
-          leg: leg
-        };
-        if (this['legColors']['highlighted'][this.map.mapTypeId] !== this['legColors']['usual'][this.map.mapTypeId]) {
-          listeners = this.makeHighlightListeners(marker);
-          gm.event.addListener(marker, 'mouseover', listeners.highlight);
-          gm.event.addListener(marker, 'mouseout', listeners.unhighlight);
-          marker.omsData.hightlightListeners = listeners;
+      spiderfiedMarkers = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = footPts.length; _i < _len; _i++) {
+          footPt = footPts[_i];
+          footLl = this.ptToLl(footPt);
+          nearestMarkerDatum = this.minExtract(markerData, __bind(function(md) {
+            return this.ptDistanceSq(md.markerPt, footPt);
+          }, this));
+          marker = nearestMarkerDatum.marker;
+          leg = new gm.Polyline({
+            map: this.map,
+            path: [marker.position, footLl],
+            strokeColor: this['legColors']['usual'][this.map.mapTypeId],
+            strokeWeight: this['legWeight'],
+            zIndex: this['usualLegZIndex']
+          });
+          marker.omsData = {
+            usualPosition: marker.position,
+            leg: leg
+          };
+          if (this['legColors']['highlighted'][this.map.mapTypeId] !== this['legColors']['usual'][this.map.mapTypeId]) {
+            listeners = this.makeHighlightListeners(marker);
+            gm.event.addListener(marker, 'mouseover', listeners.highlight);
+            gm.event.addListener(marker, 'mouseout', listeners.unhighlight);
+            marker.omsData.hightlightListeners = listeners;
+          }
+          marker.setPosition(footLl);
+          marker.setZIndex(Math.round(this['spiderfiedZIndex'] + footPt.y));
+          _results.push(marker);
         }
-        marker.setPosition(footLl);
-        marker.setZIndex(Math.round(this['spiderfiedZIndex'] + footPt.y));
-        spiderfiedMarkers.push(marker);
-      }
+        return _results;
+      }).call(this);
       return this.trigger('spiderfy', spiderfiedMarkers);
     };
-    p.unspiderfy = function() {
+    p['unspiderfy'] = function() {
       var listeners, marker, unspiderfiedMarkers, _i, _len, _ref;
       if (this.spiderfied == null) {
         return;
@@ -261,7 +265,7 @@
       for (index = 0, _len = set.length; index < _len; index++) {
         item = set[index];
         val = func(item);
-        if (!(typeof bestIndex !== "undefined" && bestIndex !== null) || val < bestVal) {
+        if (!(typeof bestIndex != "undefined" && bestIndex !== null) || val < bestVal) {
           bestVal = val;
           bestIndex = index;
         }
