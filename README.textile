@@ -4,7 +4,7 @@
 
 This code makes Google Maps API *version 3* map markers behave in that Google Earth way (minus, at least as yet, the snazzy animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
 
-The compiled code has no dependencies (except Google Maps), so you can use it with any library. And it's under 3K when compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/) and gzipped.
+The compiled code has no dependencies (except Google Maps), so you can use it with any library. And it's under 3K when compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/ and gzipped.
 
 I wrote it as part of the data download feature for "Mappiness":http://www.mappiness.org.uk.
 
