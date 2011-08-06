@@ -96,6 +96,7 @@ class @['OverlappingMarkerSpiderfier']
     pxSq = px * px
     markerPt = @llToPt(marker.position)
     for m in @markers
+      continue unless m.visible
       mPt = @llToPt(m.position)
       if @ptDistanceSq(mPt, markerPt) < pxSq
         nearby.push(marker: m, markerPt: mPt)
