@@ -6,9 +6,9 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
 
 # NB. string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
 
-class this['OverlappingMarkerSpiderfier']
+class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1.3'
+  p['VERSION'] = '0.1.4'
   
   ###* @const ### gm = google.maps
   ###* @const ### mt = gm.MapTypeId
@@ -44,17 +44,20 @@ class this['OverlappingMarkerSpiderfier']
   # function declaration can be used before the function declaration itself
   constructor: (@map) ->
     @projHelper = new @constructor.ProjHelper(@map)
-    @markerListenerRefs = []
-    @markers = []
+    @initMarkerArrays()
     @listeners = {}
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
-      gm.event.addListener(@map, e, => @['unspiderfy']()) 
+      gm.event.addListener(@map, e, => @['unspiderfy']())
+      
+  p.initMarkerArrays = ->
+    @markers = []
+    @markerListenerRefs = []
 
   p['addMarker'] = (marker) ->
     listenerRef = gm.event.addListener(marker, 'click', => @spiderListener(marker))
     @markerListenerRefs.push(listenerRef)
     @markers.push(marker)
-    this  # return self, for chaining
+    @  # return self, for chaining
     
   p['removeMarker'] = (marker) ->
     @['unspiderfy']() if marker.omsData?  # otherwise it'll be stuck there forever!
@@ -63,12 +66,18 @@ class this['OverlappingMarkerSpiderfier']
     listenerRef = @markerListenerRefs.splice(i, 1)[0]
     gm.event.removeListener(listenerRef)
     @markers.splice(i, 1)
-    this  # return self, for chaining
+    @  # return self, for chaining
+    
+  p['clearMarkers'] = ->
+    @['unspiderfy']()
+    gm.event.removeListener(listenerRef) for listenerRef in @markerListenerRefs
+    @initMarkerArrays()
+    @  # return self, for chaining
         
   # available listeners: click(marker), spiderfy(markers), unspiderfy(markers)
   p['addListener'] = (event, func) ->
     (@listeners[event] ?= []).push(func)
-    this  # return self, for chaining
+    @  # return self, for chaining
   
   p.trigger = (event, args...) ->
     func(args...) for func in (@listeners[event] ? [])
@@ -172,6 +181,7 @@ class this['OverlappingMarkerSpiderfier']
         delete marker.omsData
         unspiderfiedMarkers.push(marker)
     @trigger('unspiderfy', unspiderfiedMarkers)
+    @  # return self, for chaining
   
   p.ptDistanceSq = (pt1, pt2) -> 
     dx = pt1.x - pt2.x
