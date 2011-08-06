@@ -12,7 +12,9 @@ h3. Doesn't clustering solve this problem?
 
 You may have seen the "marker clustering library":http://gmaps-utility-library-dev.googlecode.com/svn/tags/markerclusterer/1.0/docs/reference.html, which also helps deal with markers that are close together.
 
-That might be what you want. However, it probably *isn't* what you want if you have markers that are in the exact same location, or are close enough to overlap even at the maximum zoom level. In that case, clustering won't help your users pick out (and find out more about) the marker they want.
+That might be what you want. However, it probably *isn't* what you want (or, at least, the only thing you want) if you have markers that are in the exact same location, or are close enough to overlap even at the maximum zoom level. In that case, clustering won't help your users pick out (and find out more about) the marker they want.
+
+I'm told that the OverlappingMarkerSpiderfier plays nice with clustering -- i.e. once you get down to a level where individual markers are shown, these markers spiderfy happily -- but I haven't yet tried it myself.
 
 h2. Demo
 
