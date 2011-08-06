@@ -89,7 +89,11 @@ Adds @marker@ (a @google.maps.Marker@) to be tracked.
 
 bc. removeMarker(marker)
 
-Removes @marker@ (a @google.maps.Marker@) from those being tracked.
+Removes @marker@ from those being tracked.
+
+bc. clearMarkers()
+
+Removes every @marker@ from being tracked (_much_ quicker than calling @removeMarker@ many times).
 
 bc. addListener(event, listenerFunc)
 
