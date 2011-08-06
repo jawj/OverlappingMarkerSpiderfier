@@ -7,7 +7,7 @@
   this['OverlappingMarkerSpiderfier'] = (function() {
     var gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.1.3';
+    p['VERSION'] = '0.1.4';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -39,8 +39,7 @@
       var e, _i, _len, _ref;
       this.map = map;
       this.projHelper = new this.constructor.ProjHelper(this.map);
-      this.markerListenerRefs = [];
-      this.markers = [];
+      this.initMarkerArrays();
       this.listeners = {};
       _ref = ['click', 'zoom_changed', 'maptypeid_changed'];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -50,6 +49,10 @@
         }, this));
       }
     }
+    p.initMarkerArrays = function() {
+      this.markers = [];
+      return this.markerListenerRefs = [];
+    };
     p['addMarker'] = function(marker) {
       var listenerRef;
       listenerRef = gm.event.addListener(marker, 'click', __bind(function() {
@@ -71,6 +74,17 @@
       listenerRef = this.markerListenerRefs.splice(i, 1)[0];
       gm.event.removeListener(listenerRef);
       this.markers.splice(i, 1);
+      return this;
+    };
+    p['clearMarkers'] = function() {
+      var listenerRef, _i, _len, _ref;
+      this['unspiderfy']();
+      _ref = this.markerListenerRefs;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        listenerRef = _ref[_i];
+        gm.event.removeListener(listenerRef);
+      }
+      this.initMarkerArrays();
       return this;
     };
     p['addListener'] = function(event, func) {
@@ -235,7 +249,8 @@
           unspiderfiedMarkers.push(marker);
         }
       }
-      return this.trigger('unspiderfy', unspiderfiedMarkers);
+      this.trigger('unspiderfy', unspiderfiedMarkers);
+      return this;
     };
     p.ptDistanceSq = function(pt1, pt2) {
       var dx, dy;
