@@ -129,10 +129,11 @@ There are various properties you can set on an @OverlappingMarkerSpiderfier@ ins
 
 @legColors.usual[mapType]@ and @legColors.highlighted[mapType]@, which determine the usual and highlighted colours of those lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants. Defaults:
 
-bc. legColors.usual[google.maps.MapTypeId.HYBRID] = legColors.usual[google.maps.MapTypeId.SATELLITE] = '#fff'
-legColors.usual[google.maps.MapTypeId.TERRAIN] = legColors.usual[google.maps.MapTypeId.ROADMAP] = '#444'
-legColors.highlighted[google.maps.MapTypeId.HYBRID] = legColors.highlighted[google.maps.MapTypeId.SATELLITE] = 
-  legColors.highlighted[google.maps.MapTypeId.TERRAIN] = legColors.highlighted[google.maps.MapTypeId.ROADMAP] = '#f00'
+bc. mti = google.maps.MapTypeId
+legColors.usual[mti.HYBRID] = legColors.usual[mti.SATELLITE] = '#fff'
+legColors.usual[mti.TERRAIN] = legColors.usual[mti.ROADMAP] = '#444'
+legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] = 
+  legColors.highlighted[mti.TERRAIN] = legColors.highlighted[mti.ROADMAP] = '#f00'
 
 h2. Licence
 
