@@ -123,6 +123,9 @@
       _ref = this.markers;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         m = _ref[_i];
+        if (!m.visible) {
+          continue;
+        }
         mPt = this.llToPt(m.position);
         if (this.ptDistanceSq(mPt, markerPt) < pxSq) {
           nearby.push({
