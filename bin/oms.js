@@ -7,7 +7,7 @@
   this['OverlappingMarkerSpiderfier'] = (function() {
     var gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.1.5';
+    p['VERSION'] = '0.1.6';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -35,9 +35,10 @@
     lcH[mt.HYBRID] = lcH[mt.SATELLITE] = '#f00';
     lcU[mt.TERRAIN] = lcU[mt.ROADMAP] = '#444';
     lcH[mt.TERRAIN] = lcH[mt.ROADMAP] = '#f00';
-    function _Class(map) {
+    function _Class(map, opts) {
       var e, _i, _len, _ref;
       this.map = map;
+      this.opts = opts != null ? opts : {};
       this.projHelper = new this.constructor.ProjHelper(this.map);
       this.initMarkerArrays();
       this.listeners = {};
@@ -54,35 +55,52 @@
       return this.markerListenerRefs = [];
     };
     p['addMarker'] = function(marker) {
-      var listenerRef;
-      listenerRef = gm.event.addListener(marker, 'click', __bind(function() {
+      var clickRef, positionRef, visibilityRef;
+      clickRef = gm.event.addListener(marker, 'click', __bind(function() {
         return this.spiderListener(marker);
       }, this));
-      this.markerListenerRefs.push(listenerRef);
+      visibilityRef = gm.event.addListener(marker, 'visible_changed', __bind(function() {
+        return this.markerChangeListener(marker, false);
+      }, this));
+      positionRef = gm.event.addListener(marker, 'position_changed', __bind(function() {
+        return this.markerChangeListener(marker, true);
+      }, this));
+      this.markerListenerRefs.push([clickRef, visibilityRef, positionRef]);
       this.markers.push(marker);
       return this;
     };
+    p.markerChangeListener = function(marker, positionChanged) {
+      if ((marker['_omsData'] != null) && (positionChanged || !marker.getVisible()) && !((this.spiderfying != null) || (this.unspiderfying != null))) {
+        return this.unspiderfy(positionChanged ? marker : null);
+      }
+    };
     p['removeMarker'] = function(marker) {
-      var i, listenerRef;
-      if (marker.omsData != null) {
+      var i, listenerRef, listenerRefs, _i, _len;
+      if (marker['_omsData'] != null) {
         this['unspiderfy']();
       }
       i = this.arrIndexOf(this.markers, marker);
       if (i < 0) {
         return;
       }
-      listenerRef = this.markerListenerRefs.splice(i, 1)[0];
-      gm.event.removeListener(listenerRef);
+      listenerRefs = this.markerListenerRefs.splice(i, 1)[0];
+      for (_i = 0, _len = listenerRefs.length; _i < _len; _i++) {
+        listenerRef = listenerRefs[_i];
+        gm.event.removeListener(listenerRef);
+      }
       this.markers.splice(i, 1);
       return this;
     };
     p['clearMarkers'] = function() {
-      var listenerRef, _i, _len, _ref;
+      var listenerRef, listenerRefs, _i, _j, _len, _len2, _ref;
       this['unspiderfy']();
       _ref = this.markerListenerRefs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        listenerRef = _ref[_i];
-        gm.event.removeListener(listenerRef);
+        listenerRefs = _ref[_i];
+        for (_j = 0, _len2 = listenerRefs.length; _j < _len2; _j++) {
+          listenerRef = listenerRefs[_j];
+          gm.event.removeListener(listenerRef);
+        }
       }
       this.initMarkerArrays();
       return this;
@@ -163,7 +181,7 @@
     };
     p.spiderListener = function(marker) {
       var markerSpiderfied, nearbyMarkerData;
-      markerSpiderfied = marker.omsData != null;
+      markerSpiderfied = marker['_omsData'] != null;
       this['unspiderfy']();
       if (markerSpiderfied) {
         return this.trigger('click', marker);
@@ -179,13 +197,13 @@
     p.makeHighlightListeners = function(marker) {
       return {
         highlight: __bind(function() {
-          return marker.omsData.leg.setOptions({
+          return marker['_omsData'].leg.setOptions({
             strokeColor: this['legColors']['highlighted'][this.map.mapTypeId],
             zIndex: this['highlightedLegZIndex']
           });
         }, this),
         unhighlight: __bind(function() {
-          return marker.omsData.leg.setOptions({
+          return marker['_omsData'].leg.setOptions({
             strokeColor: this['legColors']['usual'][this.map.mapTypeId],
             zIndex: this['usualLegZIndex']
           });
@@ -194,7 +212,7 @@
     };
     p.spiderfy = function(markerData) {
       var bodyPt, footLl, footPt, footPts, leg, listeners, marker, md, nearestMarkerDatum, numFeet, spiderfiedMarkers;
-      this.spiderfied = true;
+      this.spiderfying = true;
       numFeet = markerData.length;
       bodyPt = this.ptAverage((function() {
         var _i, _len, _results;
@@ -223,7 +241,7 @@
             strokeWeight: this['legWeight'],
             zIndex: this['usualLegZIndex']
           });
-          marker.omsData = {
+          marker['_omsData'] = {
             usualPosition: marker.position,
             leg: leg
           };
@@ -231,7 +249,7 @@
             listeners = this.makeHighlightListeners(marker);
             gm.event.addListener(marker, 'mouseover', listeners.highlight);
             gm.event.addListener(marker, 'mouseout', listeners.unhighlight);
-            marker.omsData.hightlightListeners = listeners;
+            marker['_omsData'].hightlightListeners = listeners;
           }
           marker.setPosition(footLl);
           marker.setZIndex(Math.round(this['spiderfiedZIndex'] + footPt.y));
@@ -239,31 +257,40 @@
         }
         return _results;
       }).call(this);
+      delete this.spiderfying;
+      this.spiderfied = true;
       return this.trigger('spiderfy', spiderfiedMarkers);
     };
-    p['unspiderfy'] = function() {
+    p['unspiderfy'] = function(markerNotToMove) {
       var listeners, marker, unspiderfiedMarkers, _i, _len, _ref;
+      if (markerNotToMove == null) {
+        markerNotToMove = null;
+      }
       if (this.spiderfied == null) {
         return;
       }
-      delete this.spiderfied;
+      this.unspiderfying = true;
       unspiderfiedMarkers = [];
       _ref = this.markers;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         marker = _ref[_i];
-        if (marker.omsData != null) {
-          marker.omsData.leg.setMap(null);
-          marker.setPosition(marker.omsData.usualPosition);
+        if (marker['_omsData'] != null) {
+          marker['_omsData'].leg.setMap(null);
+          if (marker !== markerNotToMove) {
+            marker.setPosition(marker['_omsData'].usualPosition);
+          }
           marker.setZIndex(null);
-          listeners = marker.omsData.hightlightListeners;
+          listeners = marker['_omsData'].hightlightListeners;
           if (listeners != null) {
             gm.event.clearListeners(marker, 'mouseover', listeners.highlight);
             gm.event.clearListeners(marker, 'mouseout', listeners.unhighlight);
           }
-          delete marker.omsData;
+          delete marker['_omsData'];
           unspiderfiedMarkers.push(marker);
         }
       }
+      delete this.unspiderfying;
+      delete this.spiderfied;
       this.trigger('unspiderfy', unspiderfiedMarkers);
       return this;
     };

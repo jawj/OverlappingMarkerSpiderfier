@@ -19,7 +19,8 @@
       var gm = google.maps;
       var map = new gm.Map(document.getElementById('map_canvas'), {
         mapTypeId: gm.MapTypeId.SATELLITE,
-        center: new gm.LatLng(50, 0), zoom: 6  // whatevs: fitBounds will override
+        center: new gm.LatLng(50, 0), zoom: 6,  // whatevs: fitBounds will override
+        scrollwheel: false
       });
       var iw = new gm.InfoWindow();
       var oms = new OverlappingMarkerSpiderfier(map);
