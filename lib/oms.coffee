@@ -8,7 +8,7 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1.5'
+  p['VERSION'] = '0.1.6'
   
   ###* @const ### gm = google.maps
   ###* @const ### mt = gm.MapTypeId
@@ -42,7 +42,7 @@ class @['OverlappingMarkerSpiderfier']
   
   # Note: it's OK that this constructor comes after the properties, because a function defined by a 
   # function declaration can be used before the function declaration itself
-  constructor: (@map) ->
+  constructor: (@map, @opts = {}) ->
     @projHelper = new @constructor.ProjHelper(@map)
     @initMarkerArrays()
     @listeners = {}
@@ -52,25 +52,32 @@ class @['OverlappingMarkerSpiderfier']
   p.initMarkerArrays = ->
     @markers = []
     @markerListenerRefs = []
-
+    
   p['addMarker'] = (marker) ->
-    listenerRef = gm.event.addListener(marker, 'click', => @spiderListener(marker))
-    @markerListenerRefs.push(listenerRef)
+    clickRef      = gm.event.addListener(marker, 'click',            => @spiderListener(marker))
+    visibilityRef = gm.event.addListener(marker, 'visible_changed',  => @markerChangeListener(marker, no))
+    positionRef   = gm.event.addListener(marker, 'position_changed', => @markerChangeListener(marker, yes))
+    @markerListenerRefs.push([clickRef, visibilityRef, positionRef])
     @markers.push(marker)
     @  # return self, for chaining
-    
+
+  p.markerChangeListener = (marker, positionChanged) ->
+    if marker['_omsData']? and (positionChanged or not marker.getVisible()) and not (@spiderfying? or @unspiderfying?)
+      @unspiderfy(if positionChanged then marker else null) 
+
   p['removeMarker'] = (marker) ->
-    @['unspiderfy']() if marker.omsData?  # otherwise it'll be stuck there forever!
+    @['unspiderfy']() if marker['_omsData']?  # otherwise it'll be stuck there forever!
     i = @arrIndexOf(@markers, marker)
     return if i < 0
-    listenerRef = @markerListenerRefs.splice(i, 1)[0]
-    gm.event.removeListener(listenerRef)
+    listenerRefs = @markerListenerRefs.splice(i, 1)[0]
+    gm.event.removeListener(listenerRef) for listenerRef in listenerRefs
     @markers.splice(i, 1)
     @  # return self, for chaining
     
   p['clearMarkers'] = ->
     @['unspiderfy']()
-    gm.event.removeListener(listenerRef) for listenerRef in @markerListenerRefs
+    for listenerRefs in @markerListenerRefs
+      gm.event.removeListener(listenerRef) for listenerRef in listenerRefs
     @initMarkerArrays()
     @  # return self, for chaining
         
@@ -122,7 +129,7 @@ class @['OverlappingMarkerSpiderfier']
       pt
   
   p.spiderListener = (marker) ->
-    markerSpiderfied = marker.omsData?
+    markerSpiderfied = marker['_omsData']?
     @['unspiderfy']()
     if markerSpiderfied
       @trigger('click', marker)
@@ -135,16 +142,16 @@ class @['OverlappingMarkerSpiderfier']
   
   p.makeHighlightListeners = (marker) ->
     highlight: 
-      => marker.omsData.leg.setOptions
+      => marker['_omsData'].leg.setOptions
         strokeColor: @['legColors']['highlighted'][@map.mapTypeId]
         zIndex: @['highlightedLegZIndex']
     unhighlight: 
-      => marker.omsData.leg.setOptions
+      => marker['_omsData'].leg.setOptions
         strokeColor: @['legColors']['usual'][@map.mapTypeId]
         zIndex: @['usualLegZIndex']
   
   p.spiderfy = (markerData) ->
-    @spiderfied = yes
+    @spiderfying = yes
     numFeet = markerData.length
     bodyPt = @ptAverage(md.markerPt for md in markerData)
     footPts = if numFeet >= @['circleSpiralSwitchover'] 
@@ -161,7 +168,7 @@ class @['OverlappingMarkerSpiderfier']
         strokeColor: @['legColors']['usual'][@map.mapTypeId]
         strokeWeight: @['legWeight']
         zIndex: @['usualLegZIndex']
-      marker.omsData = 
+      marker['_omsData'] = 
         usualPosition: marker.position
         leg: leg
       unless @['legColors']['highlighted'][@map.mapTypeId] ==
@@ -169,27 +176,31 @@ class @['OverlappingMarkerSpiderfier']
         listeners = @makeHighlightListeners(marker)
         gm.event.addListener(marker, 'mouseover', listeners.highlight)
         gm.event.addListener(marker, 'mouseout', listeners.unhighlight)
-        marker.omsData.hightlightListeners = listeners
+        marker['_omsData'].hightlightListeners = listeners
       marker.setPosition(footLl)
       marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # so lower markers cover higher ones
       marker
+    delete @spiderfying
+    @spiderfied = yes
     @trigger('spiderfy', spiderfiedMarkers)
   
-  p['unspiderfy'] = ->
+  p['unspiderfy'] = (markerNotToMove = null) ->
     return unless @spiderfied?
-    delete @spiderfied
+    @unspiderfying = yes
     unspiderfiedMarkers = []
     for marker in @markers
-      if marker.omsData?
-        marker.omsData.leg.setMap(null)
-        marker.setPosition(marker.omsData.usualPosition)
+      if marker['_omsData']?
+        marker['_omsData'].leg.setMap(null)
+        marker.setPosition(marker['_omsData'].usualPosition) unless marker == markerNotToMove
         marker.setZIndex(null)
-        listeners = marker.omsData.hightlightListeners
+        listeners = marker['_omsData'].hightlightListeners
         if listeners?
           gm.event.clearListeners(marker, 'mouseover', listeners.highlight)
           gm.event.clearListeners(marker, 'mouseout', listeners.unhighlight)
-        delete marker.omsData
+        delete marker['_omsData']
         unspiderfiedMarkers.push(marker)
+    delete @unspiderfying
+    delete @spiderfied
     @trigger('unspiderfy', unspiderfiedMarkers)
     @  # return self, for chaining
   
