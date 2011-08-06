@@ -8,7 +8,7 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1.4'
+  p['VERSION'] = '0.1.5'
   
   ###* @const ### gm = google.maps
   ###* @const ### mt = gm.MapTypeId
@@ -48,7 +48,7 @@ class @['OverlappingMarkerSpiderfier']
     @listeners = {}
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
       gm.event.addListener(@map, e, => @['unspiderfy']())
-      
+    
   p.initMarkerArrays = ->
     @markers = []
     @markerListenerRefs = []
@@ -77,6 +77,15 @@ class @['OverlappingMarkerSpiderfier']
   # available listeners: click(marker), spiderfy(markers), unspiderfy(markers)
   p['addListener'] = (event, func) ->
     (@listeners[event] ?= []).push(func)
+    @  # return self, for chaining
+    
+  p['removeListener'] = (event, func) ->
+    i = @arrIndexOf(@listeners[event], func)
+    @listeners[event].splice(i, 1) unless i < 0
+    @  # return self, for chaining
+  
+  p['clearListeners'] = (event) ->
+    @listeners[event] = []
     @  # return self, for chaining
   
   p.trigger = (event, args...) ->
