@@ -7,7 +7,7 @@
   this['OverlappingMarkerSpiderfier'] = (function() {
     var gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.1.4';
+    p['VERSION'] = '0.1.5';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -90,6 +90,18 @@
     p['addListener'] = function(event, func) {
       var _base, _ref;
       ((_ref = (_base = this.listeners)[event]) != null ? _ref : _base[event] = []).push(func);
+      return this;
+    };
+    p['removeListener'] = function(event, func) {
+      var i;
+      i = this.arrIndexOf(this.listeners[event], func);
+      if (!(i < 0)) {
+        this.listeners[event].splice(i, 1);
+      }
+      return this;
+    };
+    p['clearListeners'] = function(event) {
+      this.listeners[event] = [];
       return this;
     };
     p.trigger = function() {
