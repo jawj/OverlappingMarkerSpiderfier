@@ -5,11 +5,13 @@
   Released under the MIT licence: http://opensource.org/licenses/mit-license
   */  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   this['OverlappingMarkerSpiderfier'] = (function() {
-    var gm, lcH, lcU, mt, p, twoPi;
+    var ge, gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.1.6';
+    p['VERSION'] = '0.1.7';
     /** @const */
     gm = google.maps;
+    /** @const */
+    ge = gm.event;
     /** @const */
     mt = gm.MapTypeId;
     /** @const */
@@ -45,7 +47,7 @@
       _ref = ['click', 'zoom_changed', 'maptypeid_changed'];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         e = _ref[_i];
-        gm.event.addListener(this.map, e, __bind(function() {
+        ge.addListener(this.map, e, __bind(function() {
           return this['unspiderfy']();
         }, this));
       }
@@ -55,17 +57,23 @@
       return this.markerListenerRefs = [];
     };
     p['addMarker'] = function(marker) {
-      var clickRef, positionRef, visibilityRef;
-      clickRef = gm.event.addListener(marker, 'click', __bind(function() {
-        return this.spiderListener(marker);
-      }, this));
-      visibilityRef = gm.event.addListener(marker, 'visible_changed', __bind(function() {
-        return this.markerChangeListener(marker, false);
-      }, this));
-      positionRef = gm.event.addListener(marker, 'position_changed', __bind(function() {
-        return this.markerChangeListener(marker, true);
-      }, this));
-      this.markerListenerRefs.push([clickRef, visibilityRef, positionRef]);
+      var listenerRefs;
+      listenerRefs = [
+        ge.addListener(marker, 'click', __bind(function() {
+          return this.spiderListener(marker);
+        }, this))
+      ];
+      if (!this.opts['markersWontHide']) {
+        listenerRefs.push(ge.addListener(marker, 'visible_changed', __bind(function() {
+          return this.markerChangeListener(marker, false);
+        }, this)));
+      }
+      if (!this.opts['markersWontMove']) {
+        listenerRefs.push(ge.addListener(marker, 'position_changed', __bind(function() {
+          return this.markerChangeListener(marker, true);
+        }, this)));
+      }
+      this.markerListenerRefs.push(listenerRefs);
       this.markers.push(marker);
       return this;
     };
@@ -86,7 +94,7 @@
       listenerRefs = this.markerListenerRefs.splice(i, 1)[0];
       for (_i = 0, _len = listenerRefs.length; _i < _len; _i++) {
         listenerRef = listenerRefs[_i];
-        gm.event.removeListener(listenerRef);
+        ge.removeListener(listenerRef);
       }
       this.markers.splice(i, 1);
       return this;
@@ -99,7 +107,7 @@
         listenerRefs = _ref[_i];
         for (_j = 0, _len2 = listenerRefs.length; _j < _len2; _j++) {
           listenerRef = listenerRefs[_j];
-          gm.event.removeListener(listenerRef);
+          ge.removeListener(listenerRef);
         }
       }
       this.initMarkerArrays();
@@ -247,8 +255,8 @@
           };
           if (this['legColors']['highlighted'][this.map.mapTypeId] !== this['legColors']['usual'][this.map.mapTypeId]) {
             listeners = this.makeHighlightListeners(marker);
-            gm.event.addListener(marker, 'mouseover', listeners.highlight);
-            gm.event.addListener(marker, 'mouseout', listeners.unhighlight);
+            ge.addListener(marker, 'mouseover', listeners.highlight);
+            ge.addListener(marker, 'mouseout', listeners.unhighlight);
             marker['_omsData'].hightlightListeners = listeners;
           }
           marker.setPosition(footLl);
@@ -282,8 +290,8 @@
           marker.setZIndex(null);
           listeners = marker['_omsData'].hightlightListeners;
           if (listeners != null) {
-            gm.event.clearListeners(marker, 'mouseover', listeners.highlight);
-            gm.event.clearListeners(marker, 'mouseout', listeners.unhighlight);
+            ge.clearListeners(marker, 'mouseover', listeners.highlight);
+            ge.clearListeners(marker, 'mouseout', listeners.unhighlight);
           }
           delete marker['_omsData'];
           unspiderfiedMarkers.push(marker);
