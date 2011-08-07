@@ -8,9 +8,10 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1.6'
+  p['VERSION'] = '0.1.7'
   
   ###* @const ### gm = google.maps
+  ###* @const ### ge = gm.event
   ###* @const ### mt = gm.MapTypeId
   ###* @const ### twoPi = Math.PI * 2
 
@@ -47,17 +48,19 @@ class @['OverlappingMarkerSpiderfier']
     @initMarkerArrays()
     @listeners = {}
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
-      gm.event.addListener(@map, e, => @['unspiderfy']())
+      ge.addListener(@map, e, => @['unspiderfy']())
     
   p.initMarkerArrays = ->
     @markers = []
     @markerListenerRefs = []
     
   p['addMarker'] = (marker) ->
-    clickRef      = gm.event.addListener(marker, 'click',            => @spiderListener(marker))
-    visibilityRef = gm.event.addListener(marker, 'visible_changed',  => @markerChangeListener(marker, no))
-    positionRef   = gm.event.addListener(marker, 'position_changed', => @markerChangeListener(marker, yes))
-    @markerListenerRefs.push([clickRef, visibilityRef, positionRef])
+    listenerRefs = [ge.addListener(marker, 'click', => @spiderListener(marker))]
+    unless @opts['markersWontHide']
+      listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
+    unless @opts['markersWontMove']
+      listenerRefs.push(ge.addListener(marker, 'position_changed', => @markerChangeListener(marker, yes)))
+    @markerListenerRefs.push(listenerRefs)
     @markers.push(marker)
     @  # return self, for chaining
 
@@ -70,14 +73,14 @@ class @['OverlappingMarkerSpiderfier']
     i = @arrIndexOf(@markers, marker)
     return if i < 0
     listenerRefs = @markerListenerRefs.splice(i, 1)[0]
-    gm.event.removeListener(listenerRef) for listenerRef in listenerRefs
+    ge.removeListener(listenerRef) for listenerRef in listenerRefs
     @markers.splice(i, 1)
     @  # return self, for chaining
     
   p['clearMarkers'] = ->
     @['unspiderfy']()
     for listenerRefs in @markerListenerRefs
-      gm.event.removeListener(listenerRef) for listenerRef in listenerRefs
+      ge.removeListener(listenerRef) for listenerRef in listenerRefs
     @initMarkerArrays()
     @  # return self, for chaining
         
@@ -174,11 +177,11 @@ class @['OverlappingMarkerSpiderfier']
       unless @['legColors']['highlighted'][@map.mapTypeId] ==
              @['legColors']['usual'][@map.mapTypeId]
         listeners = @makeHighlightListeners(marker)
-        gm.event.addListener(marker, 'mouseover', listeners.highlight)
-        gm.event.addListener(marker, 'mouseout', listeners.unhighlight)
+        ge.addListener(marker, 'mouseover', listeners.highlight)
+        ge.addListener(marker, 'mouseout', listeners.unhighlight)
         marker['_omsData'].hightlightListeners = listeners
       marker.setPosition(footLl)
-      marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # so lower markers cover higher ones
+      marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # lower markers cover higher
       marker
     delete @spiderfying
     @spiderfied = yes
@@ -195,8 +198,8 @@ class @['OverlappingMarkerSpiderfier']
         marker.setZIndex(null)
         listeners = marker['_omsData'].hightlightListeners
         if listeners?
-          gm.event.clearListeners(marker, 'mouseover', listeners.highlight)
-          gm.event.clearListeners(marker, 'mouseout', listeners.unhighlight)
+          ge.clearListeners(marker, 'mouseover', listeners.highlight)
+          ge.clearListeners(marker, 'mouseout', listeners.unhighlight)
         delete marker['_omsData']
         unspiderfiedMarkers.push(marker)
     delete @unspiderfying
