@@ -2,8 +2,13 @@
   /** @preserve OverlappingMarkerSpiderfier
   https://github.com/jawj/OverlappingMarkerSpiderfier
   Copyright (c) 2011 George MacKerron
-  Released under the MIT licence: http://opensource.org/licenses/mit-license 
-  */  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
+  Released under the MIT licence: http://opensource.org/licenses/mit-license
+  Note: The Google Maps API v3 must be included *before* this code
+  */  var _ref;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
+  if (((_ref = this.google) != null ? _ref.maps : void 0) == null) {
+    return;
+  }
   this['OverlappingMarkerSpiderfier'] = (function() {
     var ge, gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
@@ -38,15 +43,15 @@
     lcU[mt.TERRAIN] = lcU[mt.ROADMAP] = '#444';
     lcH[mt.TERRAIN] = lcH[mt.ROADMAP] = '#f00';
     function _Class(map, opts) {
-      var e, _i, _len, _ref;
+      var e, _i, _len, _ref2;
       this.map = map;
       this.opts = opts != null ? opts : {};
       this.projHelper = new this.constructor.ProjHelper(this.map);
       this.initMarkerArrays();
       this.listeners = {};
-      _ref = ['click', 'zoom_changed', 'maptypeid_changed'];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        e = _ref[_i];
+      _ref2 = ['click', 'zoom_changed', 'maptypeid_changed'];
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        e = _ref2[_i];
         ge.addListener(this.map, e, __bind(function() {
           return this['unspiderfy']();
         }, this));
@@ -103,11 +108,11 @@
       return this;
     };
     p['clearMarkers'] = function() {
-      var listenerRef, listenerRefs, _i, _j, _len, _len2, _ref;
+      var listenerRef, listenerRefs, _i, _j, _len, _len2, _ref2;
       this['unspiderfy']();
-      _ref = this.markerListenerRefs;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        listenerRefs = _ref[_i];
+      _ref2 = this.markerListenerRefs;
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        listenerRefs = _ref2[_i];
         for (_j = 0, _len2 = listenerRefs.length; _j < _len2; _j++) {
           listenerRef = listenerRefs[_j];
           ge.removeListener(listenerRef);
@@ -117,8 +122,8 @@
       return this;
     };
     p['addListener'] = function(event, func) {
-      var _base, _ref;
-      ((_ref = (_base = this.listeners)[event]) != null ? _ref : _base[event] = []).push(func);
+      var _base, _ref2;
+      ((_ref2 = (_base = this.listeners)[event]) != null ? _ref2 : _base[event] = []).push(func);
       return this;
     };
     p['removeListener'] = function(event, func) {
@@ -134,12 +139,12 @@
       return this;
     };
     p.trigger = function() {
-      var args, event, func, _i, _len, _ref, _ref2, _results;
+      var args, event, func, _i, _len, _ref2, _ref3, _results;
       event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      _ref2 = (_ref = this.listeners[event]) != null ? _ref : [];
+      _ref3 = (_ref2 = this.listeners[event]) != null ? _ref2 : [];
       _results = [];
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        func = _ref2[_i];
+      for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+        func = _ref3[_i];
         _results.push(func.apply(null, args));
       }
       return _results;
@@ -170,7 +175,7 @@
       return _results;
     };
     p.spiderListener = function(marker) {
-      var m, mPt, markerPt, markerSpiderfied, nearbyMarkerData, nonNearbyMarkers, pxSq, _i, _len, _ref;
+      var m, mPt, markerPt, markerSpiderfied, nearbyMarkerData, nonNearbyMarkers, pxSq, _i, _len, _ref2;
       markerSpiderfied = marker['_omsData'] != null;
       this['unspiderfy']();
       if (markerSpiderfied) {
@@ -180,9 +185,9 @@
         nonNearbyMarkers = [];
         pxSq = this['nearbyDistance'] * this['nearbyDistance'];
         markerPt = this.llToPt(marker.position);
-        _ref = this.markers;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          m = _ref[_i];
+        _ref2 = this.markers;
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          m = _ref2[_i];
           if (!m.visible) {
             continue;
           }
@@ -271,7 +276,7 @@
       return this.trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers);
     };
     p['unspiderfy'] = function(markerNotToMove) {
-      var listeners, marker, nonNearbyMarkers, unspiderfiedMarkers, _i, _len, _ref;
+      var listeners, marker, nonNearbyMarkers, unspiderfiedMarkers, _i, _len, _ref2;
       if (markerNotToMove == null) {
         markerNotToMove = null;
       }
@@ -281,9 +286,9 @@
       this.unspiderfying = true;
       unspiderfiedMarkers = [];
       nonNearbyMarkers = [];
-      _ref = this.markers;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        marker = _ref[_i];
+      _ref2 = this.markers;
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        marker = _ref2[_i];
         if (marker['_omsData'] != null) {
           marker['_omsData'].leg.setMap(null);
           if (marker !== markerNotToMove) {
