@@ -4,7 +4,8 @@
   Copyright (c) 2011 George MacKerron
   Released under the MIT licence: http://opensource.org/licenses/mit-license
   Note: The Google Maps API v3 must be included *before* this code
-  */  var _ref;
+  */
+  var _ref;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   if (((_ref = this['google']) != null ? _ref['maps'] : void 0) == null) {
     return;
@@ -12,7 +13,7 @@
   this['OverlappingMarkerSpiderfier'] = (function() {
     var ge, gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.1.8';
+    p['VERSION'] = '0.2.0';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -202,7 +203,7 @@
           }
         }
         if (nearbyMarkerData.length === 1) {
-          return this.trigger('click', marker, nonNearbyMarkers);
+          return this.trigger('click', marker);
         } else {
           return this.spiderfy(nearbyMarkerData, nonNearbyMarkers);
         }
