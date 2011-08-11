@@ -73,6 +73,10 @@ bc. for (var i = 0; i < window.mapData.length; i ++) {
 
 h2. Docs
 
+h3. Loading
+
+The Google Maps API &lt;script&gt; tag must be included before this code.
+
 h3. Construction
 
 bc. new OverlappingMarkerSpiderfier(map, options)
