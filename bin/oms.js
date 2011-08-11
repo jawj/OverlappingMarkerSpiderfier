@@ -2,12 +2,12 @@
   /** @preserve OverlappingMarkerSpiderfier
   https://github.com/jawj/OverlappingMarkerSpiderfier
   Copyright (c) 2011 George MacKerron
-  Released under the MIT licence: http://opensource.org/licenses/mit-license
+  Released under the MIT licence: http://opensource.org/licenses/mit-license 
   */  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   this['OverlappingMarkerSpiderfier'] = (function() {
     var ge, gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.1.7';
+    p['VERSION'] = '0.1.8';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -82,6 +82,9 @@
         return this.unspiderfy(positionChanged ? marker : null);
       }
     };
+    p['getMarkers'] = function() {
+      return this.markers.slice(0, this.markers.length);
+    };
     p['removeMarker'] = function(marker) {
       var i, listenerRef, listenerRefs, _i, _len;
       if (marker['_omsData'] != null) {
@@ -141,34 +144,13 @@
       }
       return _results;
     };
-    p.nearbyMarkerData = function(marker, px) {
-      var m, mPt, markerPt, nearby, pxSq, _i, _len, _ref;
-      nearby = [];
-      pxSq = px * px;
-      markerPt = this.llToPt(marker.position);
-      _ref = this.markers;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        m = _ref[_i];
-        if (!m.visible) {
-          continue;
-        }
-        mPt = this.llToPt(m.position);
-        if (this.ptDistanceSq(mPt, markerPt) < pxSq) {
-          nearby.push({
-            marker: m,
-            markerPt: mPt
-          });
-        }
-      }
-      return nearby;
-    };
     p.generatePtsCircle = function(count, centerPt) {
       var angle, angleStep, circumference, i, legLength, _results;
       circumference = this['circleFootSeparation'] * (2 + count);
       legLength = circumference / twoPi;
       angleStep = twoPi / count;
       _results = [];
-      for (i = 0; (0 <= count ? i < count : i > count); (0 <= count ? i += 1 : i -= 1)) {
+      for (i = 0; 0 <= count ? i < count : i > count; 0 <= count ? i++ : i--) {
         angle = this['circleStartAngle'] + i * angleStep;
         _results.push(new gm.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle)));
       }
@@ -179,7 +161,7 @@
       legLength = this['spiralLengthStart'];
       angle = 0;
       _results = [];
-      for (i = 0; (0 <= count ? i < count : i > count); (0 <= count ? i += 1 : i -= 1)) {
+      for (i = 0; 0 <= count ? i < count : i > count; 0 <= count ? i++ : i--) {
         angle += this['spiralFootSeparation'] / legLength + i * 0.0005;
         pt = new gm.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle));
         legLength += twoPi * this['spiralLengthFactor'] / angle;
@@ -188,17 +170,36 @@
       return _results;
     };
     p.spiderListener = function(marker) {
-      var markerSpiderfied, nearbyMarkerData;
+      var m, mPt, markerPt, markerSpiderfied, nearbyMarkerData, nonNearbyMarkers, pxSq, _i, _len, _ref;
       markerSpiderfied = marker['_omsData'] != null;
       this['unspiderfy']();
       if (markerSpiderfied) {
         return this.trigger('click', marker);
       } else {
-        nearbyMarkerData = this.nearbyMarkerData(marker, this['nearbyDistance']);
+        nearbyMarkerData = [];
+        nonNearbyMarkers = [];
+        pxSq = this['nearbyDistance'] * this['nearbyDistance'];
+        markerPt = this.llToPt(marker.position);
+        _ref = this.markers;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          m = _ref[_i];
+          if (!m.visible) {
+            continue;
+          }
+          mPt = this.llToPt(m.position);
+          if (this.ptDistanceSq(mPt, markerPt) < pxSq) {
+            nearbyMarkerData.push({
+              marker: m,
+              markerPt: mPt
+            });
+          } else {
+            nonNearbyMarkers.push(m);
+          }
+        }
         if (nearbyMarkerData.length === 1) {
-          return this.trigger('click', marker);
+          return this.trigger('click', marker, nonNearbyMarkers);
         } else {
-          return this.spiderfy(nearbyMarkerData);
+          return this.spiderfy(nearbyMarkerData, nonNearbyMarkers);
         }
       }
     };
@@ -218,7 +219,7 @@
         }, this)
       };
     };
-    p.spiderfy = function(markerData) {
+    p.spiderfy = function(markerData, nonNearbyMarkers) {
       var bodyPt, footLl, footPt, footPts, leg, listeners, marker, md, nearestMarkerDatum, numFeet, spiderfiedMarkers;
       this.spiderfying = true;
       numFeet = markerData.length;
@@ -267,10 +268,10 @@
       }).call(this);
       delete this.spiderfying;
       this.spiderfied = true;
-      return this.trigger('spiderfy', spiderfiedMarkers);
+      return this.trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers);
     };
     p['unspiderfy'] = function(markerNotToMove) {
-      var listeners, marker, unspiderfiedMarkers, _i, _len, _ref;
+      var listeners, marker, nonNearbyMarkers, unspiderfiedMarkers, _i, _len, _ref;
       if (markerNotToMove == null) {
         markerNotToMove = null;
       }
@@ -279,6 +280,7 @@
       }
       this.unspiderfying = true;
       unspiderfiedMarkers = [];
+      nonNearbyMarkers = [];
       _ref = this.markers;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         marker = _ref[_i];
@@ -295,11 +297,13 @@
           }
           delete marker['_omsData'];
           unspiderfiedMarkers.push(marker);
+        } else {
+          nonNearbyMarkers.push(marker);
         }
       }
       delete this.unspiderfying;
       delete this.spiderfied;
-      this.trigger('unspiderfy', unspiderfiedMarkers);
+      this.trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
       return this;
     };
     p.ptDistanceSq = function(pt1, pt2) {
@@ -330,7 +334,7 @@
       for (index = 0, _len = set.length; index < _len; index++) {
         item = set[index];
         val = func(item);
-        if (!(typeof bestIndex != "undefined" && bestIndex !== null) || val < bestVal) {
+        if (!(typeof bestIndex !== "undefined" && bestIndex !== null) || val < bestVal) {
           bestVal = val;
           bestIndex = index;
         }
