@@ -7,7 +7,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
 # NB. string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
 
-return unless this.google?.maps?  # return from wrapper func without doing anything
+return unless this['google']?['maps']?  # return from wrapper func without doing anything
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
