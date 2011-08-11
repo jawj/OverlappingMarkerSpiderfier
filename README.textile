@@ -6,7 +6,7 @@ This code makes Google Maps API *version 3* map markers behave in that Google Ea
 
 The compiled code has no dependencies beyond Google Maps. And it's under 3K when compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/ and gzipped.
 
-I wrote it as part of the data download feature for "Mappiness":http://www.mappiness.org.uk.
+I wrote it as part of the data download feature for "Mappiness":http://www.mappiness.org.uk/maps/.
 
 h3. Doesn't clustering solve this problem?
 
@@ -89,6 +89,8 @@ For example, @var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: t
 
 h3. Instance methods
 
+Note: methods that have no obvious return value return the OverlappingMarkerSpiderfier instance they were called on, in case you want to chain method calls.
+
 bc. addMarker(marker)
 
 Adds @marker@ (a @google.maps.Marker@) to be tracked.
@@ -99,7 +101,11 @@ Removes @marker@ from those being tracked.
 
 bc. clearMarkers()
 
-Removes every @marker@ from being tracked (much quicker than calling @removeMarker@ in a loop, since that has to search the markers array every time).
+Removes every @marker@ from being tracked. Much quicker than calling @removeMarker@ in a loop, since that has to search the markers array every time.
+
+bc. getMarkers()
+
+Returns an @Array@ of all the markers that are currently being tracked. This is a copy of the one used internally, so you can do what you like with it.
 
 bc. addListener(event, listenerFunc)
 
@@ -107,7 +113,9 @@ Adds a listener to react to one of three events.
 
 @event@ may be @'click'@, @'spiderfy'@ or @'unspiderfy'@.
 
-@listenerFunc@ will receive as its argument a single marker object (@click@) or an array thereof (@spiderfy@ and @unspiderfy@).
+In the case of @'click'@ events, @listenerFunc@ receives two arguments: first, the clicked marker object; second, an @Array@ of marker objects that were not clicked.
+
+For @'spiderfy'@ or @'unspiderfy'@ events, @listenerFunc@ also receives two arguments: first, an @Array@ of the markers that were spiderfied or unspiderfied; second, an @Array@ of the markers that were not.
 
 bc. removeListener(event, listenerFunc)
 
@@ -119,7 +127,7 @@ Removes all listeners on the specified event.
 
 bc. unspiderfy()
 
-Returns any spiderfied markers to their original positions (if no markers are spiderfied, this does nothing).
+Returns any spiderfied markers to their original positions, and triggers any listeners you may have set for this event. Unless no markers are spiderfied, in which case it does nothing.
 
 h3. Properties
 

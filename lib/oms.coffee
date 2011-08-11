@@ -8,7 +8,7 @@ Released under the MIT licence: http://opensource.org/licenses/mit-license
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1.7'
+  p['VERSION'] = '0.1.8'
   
   ###* @const ### gm = google.maps
   ###* @const ### ge = gm.event
@@ -66,7 +66,10 @@ class @['OverlappingMarkerSpiderfier']
 
   p.markerChangeListener = (marker, positionChanged) ->
     if marker['_omsData']? and (positionChanged or not marker.getVisible()) and not (@spiderfying? or @unspiderfying?)
-      @unspiderfy(if positionChanged then marker else null) 
+      @unspiderfy(if positionChanged then marker else null)
+      
+  p['getMarkers'] = ->
+    @markers[0...@markers.length]  # returns a copy, so no funny business
 
   p['removeMarker'] = (marker) ->
     @['unspiderfy']() if marker['_omsData']?  # otherwise it'll be stuck there forever!
@@ -101,17 +104,6 @@ class @['OverlappingMarkerSpiderfier']
   p.trigger = (event, args...) ->
     func(args...) for func in (@listeners[event] ? [])
   
-  p.nearbyMarkerData = (marker, px) ->
-    nearby = []
-    pxSq = px * px
-    markerPt = @llToPt(marker.position)
-    for m in @markers
-      continue unless m.visible
-      mPt = @llToPt(m.position)
-      if @ptDistanceSq(mPt, markerPt) < pxSq
-        nearby.push(marker: m, markerPt: mPt)
-    nearby
-  
   p.generatePtsCircle = (count, centerPt) ->
     circumference = @['circleFootSeparation'] * (2 + count)
     legLength = circumference / twoPi  # = radius from circumference
@@ -137,11 +129,21 @@ class @['OverlappingMarkerSpiderfier']
     if markerSpiderfied
       @trigger('click', marker)
     else
-      nearbyMarkerData = @nearbyMarkerData(marker, @['nearbyDistance'])
+      nearbyMarkerData = []
+      nonNearbyMarkers = []
+      pxSq = @['nearbyDistance'] * @['nearbyDistance']
+      markerPt = @llToPt(marker.position)
+      for m in @markers
+        continue unless m.visible
+        mPt = @llToPt(m.position)
+        if @ptDistanceSq(mPt, markerPt) < pxSq
+          nearbyMarkerData.push(marker: m, markerPt: mPt)
+        else
+          nonNearbyMarkers.push(m)
       if nearbyMarkerData.length == 1  # 1 => the one clicked => none nearby
-        @trigger('click', marker)
+        @trigger('click', marker, nonNearbyMarkers)
       else
-        @spiderfy(nearbyMarkerData)
+        @spiderfy(nearbyMarkerData, nonNearbyMarkers)
   
   p.makeHighlightListeners = (marker) ->
     highlight: 
@@ -153,7 +155,7 @@ class @['OverlappingMarkerSpiderfier']
         strokeColor: @['legColors']['usual'][@map.mapTypeId]
         zIndex: @['usualLegZIndex']
   
-  p.spiderfy = (markerData) ->
+  p.spiderfy = (markerData, nonNearbyMarkers) ->
     @spiderfying = yes
     numFeet = markerData.length
     bodyPt = @ptAverage(md.markerPt for md in markerData)
@@ -185,12 +187,13 @@ class @['OverlappingMarkerSpiderfier']
       marker
     delete @spiderfying
     @spiderfied = yes
-    @trigger('spiderfy', spiderfiedMarkers)
+    @trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers)
   
   p['unspiderfy'] = (markerNotToMove = null) ->
     return unless @spiderfied?
     @unspiderfying = yes
     unspiderfiedMarkers = []
+    nonNearbyMarkers = []
     for marker in @markers
       if marker['_omsData']?
         marker['_omsData'].leg.setMap(null)
@@ -202,9 +205,11 @@ class @['OverlappingMarkerSpiderfier']
           ge.clearListeners(marker, 'mouseout', listeners.unhighlight)
         delete marker['_omsData']
         unspiderfiedMarkers.push(marker)
+      else
+        nonNearbyMarkers.push(marker)
     delete @unspiderfying
     delete @spiderfied
-    @trigger('unspiderfy', unspiderfiedMarkers)
+    @trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers)
     @  # return self, for chaining
   
   p.ptDistanceSq = (pt1, pt2) -> 
