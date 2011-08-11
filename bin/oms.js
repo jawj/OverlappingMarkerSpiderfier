@@ -6,7 +6,7 @@
   Note: The Google Maps API v3 must be included *before* this code
   */  var _ref;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
-  if (((_ref = this.google) != null ? _ref.maps : void 0) == null) {
+  if (((_ref = this['google']) != null ? _ref['maps'] : void 0) == null) {
     return;
   }
   this['OverlappingMarkerSpiderfier'] = (function() {
