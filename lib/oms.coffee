@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.1.8'
+  p['VERSION'] = '0.2.0'
   
   ###* @const ### gm = google.maps
   ###* @const ### ge = gm.event
@@ -144,7 +144,7 @@ class @['OverlappingMarkerSpiderfier']
         else
           nonNearbyMarkers.push(m)
       if nearbyMarkerData.length == 1  # 1 => the one clicked => none nearby
-        @trigger('click', marker, nonNearbyMarkers)
+        @trigger('click', marker)
       else
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
   

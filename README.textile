@@ -117,9 +117,9 @@ Adds a listener to react to one of three events.
 
 @event@ may be @'click'@, @'spiderfy'@ or @'unspiderfy'@.
 
-In the case of @'click'@ events, @listenerFunc@ receives two arguments: first, the clicked marker object; second, an @Array@ of marker objects that were not clicked.
+For @'click'@ events, @listenerFunc@ receives one argument: the clicked marker object. You'll probably want to use this listener to do something like show a @google.maps.InfoWindow@.
 
-For @'spiderfy'@ or @'unspiderfy'@ events, @listenerFunc@ also receives two arguments: first, an @Array@ of the markers that were spiderfied or unspiderfied; second, an @Array@ of the markers that were not.
+For @'spiderfy'@ or @'unspiderfy'@ events, @listenerFunc@ receives two arguments: first, an @Array@ of the markers that were spiderfied or unspiderfied; second, an @Array@ of the markers that were not. One use for these listeners is to make some distinction between spiderfied and non-spiderfied markers when some markers are spiderfied -- e.g. highlighting those that are spiderfied, or dimming out those that aren't.
 
 bc. removeListener(event, listenerFunc)
 
