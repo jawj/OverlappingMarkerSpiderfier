@@ -24,8 +24,6 @@ h2. Download
 
 Download "the compiled, minified JS source":http://jawj.github.com/OverlappingMarkerSpiderfier/bin/oms.min.js.
 
-Note: I recommend you use it with version 3.3 of the Maps API. This version is slower, but at the time of writing the &lt;canvas&gt;-based rendering in versions 3.4 and 3.5 appears to have broken handling of marker z-indices.
-
 h2. How to use
 
 See the "demo map source":/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo.html, or follow along here for a slightly simpler usage with commentary.
@@ -75,7 +73,13 @@ h2. Docs
 
 h3. Loading
 
-The Google Maps API &lt;script&gt; tag must be included before this code.
+The @google.maps@ object must be available when this code runs -- i.e. put the Google Maps API &lt;script&gt; tag before this one.
+
+At the time of writing, compatibility with Google Maps API versions is as follows:
+
+* *3.3 frozen* -- works fine, recommended for production.
+* *3.4 feature-stable* -- doesn't respect marker z-indices, therefore not recommended.
+* *3.5 nightly* -- works fine today, but may break tomorrow, therefore not recommended.
 
 h3. Construction
 
@@ -91,7 +95,7 @@ However, if you know that you won't be moving and/or hiding any of the markers y
 
 For example, @var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true});@.
 
-h3. Instance methods
+h3. Instance methods: managing markers
 
 Note: methods that have no obvious return value return the OverlappingMarkerSpiderfier instance they were called on, in case you want to chain method calls.
 
@@ -110,6 +114,8 @@ Removes every @marker@ from being tracked. Much quicker than calling @removeMark
 bc. getMarkers()
 
 Returns an @Array@ of all the markers that are currently being tracked. This is a copy of the one used internally, so you can do what you like with it.
+
+h3. Instance methods: managing listeners
 
 bc. addListener(event, listenerFunc)
 

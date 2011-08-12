@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.0'
+  p['VERSION'] = '0.2.1'
   
   ###* @const ### gm = google.maps
   ###* @const ### ge = gm.event
@@ -137,7 +137,7 @@ class @['OverlappingMarkerSpiderfier']
       pxSq = @['nearbyDistance'] * @['nearbyDistance']
       markerPt = @llToPt(marker.position)
       for m in @markers
-        continue unless m.visible
+        continue unless m.getVisible() and m.map?
         mPt = @llToPt(m.position)
         if @ptDistanceSq(mPt, markerPt) < pxSq
           nearbyMarkerData.push(marker: m, markerPt: mPt)
