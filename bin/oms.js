@@ -13,7 +13,7 @@
   this['OverlappingMarkerSpiderfier'] = (function() {
     var ge, gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.2.0';
+    p['VERSION'] = '0.2.1';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -189,7 +189,7 @@
         _ref2 = this.markers;
         for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
           m = _ref2[_i];
-          if (!m.visible) {
+          if (!(m.getVisible() && (m.map != null))) {
             continue;
           }
           mPt = this.llToPt(m.position);
