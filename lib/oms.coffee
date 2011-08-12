@@ -137,7 +137,7 @@ class @['OverlappingMarkerSpiderfier']
       pxSq = @['nearbyDistance'] * @['nearbyDistance']
       markerPt = @llToPt(marker.position)
       for m in @markers
-        continue unless m.getVisible() and m.map?
+        continue unless m.getVisible() and m.map?  # at 2011-08-12, property m.visible is undefined in API v3.5
         mPt = @llToPt(m.position)
         if @ptDistanceSq(mPt, markerPt) < pxSq
           nearbyMarkerData.push(marker: m, markerPt: mPt)
