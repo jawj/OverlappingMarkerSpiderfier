@@ -75,11 +75,7 @@ h3. Loading
 
 The @google.maps@ object must be available when this code runs -- i.e. put the Google Maps API &lt;script&gt; tag before this one.
 
-At the time of writing, compatibility with Google Maps API versions is as follows:
-
-* *3.3 frozen* -- works fine, recommended for production.
-* *3.4 feature-stable* -- doesn't respect marker z-indices, therefore not recommended.
-* *3.5 nightly* -- works fine today, but may break tomorrow, therefore not recommended.
+The Google Maps API code seems to change frequently, and lately has been breaking z-indices a lot. Also, the 'frozen' versions seem to be a lie: the 'frozen' 3.3 was working fine until recently, and then broke. At this moment, the 'stable' 3.5 seems to work well, but there are no guarantees.
 
 h3. Construction
 
