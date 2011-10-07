@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.1'
+  p['VERSION'] = '0.2.2'
   
   ###* @const ### gm = google.maps
   ###* @const ### ge = gm.event
@@ -148,7 +148,7 @@ class @['OverlappingMarkerSpiderfier']
       else
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
   
-  p.makeHighlightListeners = (marker) ->
+  p.makeHighlightListenerFuncs = (marker) ->
     highlight: 
       => marker['_omsData'].leg.setOptions
         strokeColor: @['legColors']['highlighted'][@map.mapTypeId]
@@ -181,10 +181,10 @@ class @['OverlappingMarkerSpiderfier']
         leg: leg
       unless @['legColors']['highlighted'][@map.mapTypeId] ==
              @['legColors']['usual'][@map.mapTypeId]
-        listeners = @makeHighlightListeners(marker)
-        ge.addListener(marker, 'mouseover', listeners.highlight)
-        ge.addListener(marker, 'mouseout', listeners.unhighlight)
-        marker['_omsData'].hightlightListeners = listeners
+        highlightListenerFuncs = @makeHighlightListenerFuncs(marker)
+        marker['_omsData'].hightlightListeners =
+          highlight:   ge.addListener(marker, 'mouseover', highlightListenerFuncs.highlight)
+          unhighlight: ge.addListener(marker, 'mouseout',  highlightListenerFuncs.unhighlight)
       marker.setPosition(footLl)
       marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # lower markers cover higher
       marker
@@ -204,8 +204,8 @@ class @['OverlappingMarkerSpiderfier']
         marker.setZIndex(null)
         listeners = marker['_omsData'].hightlightListeners
         if listeners?
-          ge.clearListeners(marker, 'mouseover', listeners.highlight)
-          ge.clearListeners(marker, 'mouseout', listeners.unhighlight)
+          ge.removeListener(listeners.highlight)
+          ge.removeListener(listeners.unhighlight)
         delete marker['_omsData']
         unspiderfiedMarkers.push(marker)
       else
