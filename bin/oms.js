@@ -13,7 +13,7 @@
   this['OverlappingMarkerSpiderfier'] = (function() {
     var ge, gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.2.1';
+    p['VERSION'] = '0.2.2';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -209,7 +209,7 @@
         }
       }
     };
-    p.makeHighlightListeners = function(marker) {
+    p.makeHighlightListenerFuncs = function(marker) {
       return {
         highlight: __bind(function() {
           return marker['_omsData'].leg.setOptions({
@@ -226,7 +226,7 @@
       };
     };
     p.spiderfy = function(markerData, nonNearbyMarkers) {
-      var bodyPt, footLl, footPt, footPts, leg, listeners, marker, md, nearestMarkerDatum, numFeet, spiderfiedMarkers;
+      var bodyPt, footLl, footPt, footPts, highlightListenerFuncs, leg, marker, md, nearestMarkerDatum, numFeet, spiderfiedMarkers;
       this.spiderfying = true;
       numFeet = markerData.length;
       bodyPt = this.ptAverage((function() {
@@ -261,10 +261,11 @@
             leg: leg
           };
           if (this['legColors']['highlighted'][this.map.mapTypeId] !== this['legColors']['usual'][this.map.mapTypeId]) {
-            listeners = this.makeHighlightListeners(marker);
-            ge.addListener(marker, 'mouseover', listeners.highlight);
-            ge.addListener(marker, 'mouseout', listeners.unhighlight);
-            marker['_omsData'].hightlightListeners = listeners;
+            highlightListenerFuncs = this.makeHighlightListenerFuncs(marker);
+            marker['_omsData'].hightlightListeners = {
+              highlight: ge.addListener(marker, 'mouseover', highlightListenerFuncs.highlight),
+              unhighlight: ge.addListener(marker, 'mouseout', highlightListenerFuncs.unhighlight)
+            };
           }
           marker.setPosition(footLl);
           marker.setZIndex(Math.round(this['spiderfiedZIndex'] + footPt.y));
@@ -298,8 +299,8 @@
           marker.setZIndex(null);
           listeners = marker['_omsData'].hightlightListeners;
           if (listeners != null) {
-            ge.clearListeners(marker, 'mouseover', listeners.highlight);
-            ge.clearListeners(marker, 'mouseout', listeners.unhighlight);
+            ge.removeListener(listeners.highlight);
+            ge.removeListener(listeners.unhighlight);
           }
           delete marker['_omsData'];
           unspiderfiedMarkers.push(marker);
