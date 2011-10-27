@@ -85,7 +85,7 @@ Creates an instance associated with @map@ (a @google.maps.Map@).
 
 The @options@ argument is an optional @Object@ with three available boolean properties.
 
-h2. @markersWontMove@ and @markersWontHide@
+*@markersWontMove@ and @markersWontHide@*
 
 By default, change events for each added marker's @position@ and @visibility@ are observed (so that, if a spiderfied marker is moved or hidden, all spiderfied markers are unspiderfied, and the new position is respected where applicable).
 
@@ -93,7 +93,7 @@ However, if you know that you won't be moving and/or hiding any of the markers y
 
 For example, @var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true});@.
 
-h2. @keepSpiderfied@
+*@keepSpiderfied@*
 
 By default, the OverlappingMarkerSpiderfier works like Google Earth, in that when you click a spiderfied marker, the markers unspiderfy before any other action takes place. 
 
