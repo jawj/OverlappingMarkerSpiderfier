@@ -83,13 +83,22 @@ bc. new OverlappingMarkerSpiderfier(map, options)
 
 Creates an instance associated with @map@ (a @google.maps.Map@).
 
-The @options@ argument is an optional @Object@ with two possible properties.
+The @options@ argument is an optional @Object@ with three available boolean properties.
+
+h2. @markersWontMove@ and @markersWontHide@
 
 By default, change events for each added marker's @position@ and @visibility@ are observed (so that, if a spiderfied marker is moved or hidden, all spiderfied markers are unspiderfied, and the new position is respected where applicable).
 
-However, if you know that you won't be moving and/or hiding any of the markers you add to this instance, you can save memory (a closure per marker in each case) by setting properties named @markersWontMove@ and/or @markersWontHide@ to @true@.
+However, if you know that you won't be moving and/or hiding any of the markers you add to this instance, you can save memory (a closure per marker in each case) by setting properties named @markersWontMove@ and/or @markersWontHide@ to @true@ (or anything "truthy":http://isolani.co.uk/blog/javascript/TruthyFalsyAndTypeCasting).
 
 For example, @var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true});@.
+
+h2. @keepSpiderfied@
+
+By default, the OverlappingMarkerSpiderfier works like Google Earth, in that when you click a spiderfied marker, the markers unspiderfy before any other action takes place. 
+
+Since this can make it tricky for the user to work through a set of markers one by one, you can override this behaviour by setting the @keepSpiderfied@ option to @true@.
+
 
 h3. Instance methods: managing markers
 
