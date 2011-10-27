@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.2'
+  p['VERSION'] = '0.2.3'
   
   ###* @const ### gm = google.maps
   ###* @const ### ge = gm.event
@@ -46,7 +46,7 @@ class @['OverlappingMarkerSpiderfier']
   
   # Note: it's OK that this constructor comes after the properties, because a function defined by a 
   # function declaration can be used before the function declaration itself
-  constructor: (@map, @opts = {}) ->
+  constructor: (@map, @opts = {}) ->  # available opts: keepSpiderfied, markersWontHide, markersWontMove
     @projHelper = new @constructor.ProjHelper(@map)
     @initMarkerArrays()
     @listeners = {}
@@ -128,7 +128,7 @@ class @['OverlappingMarkerSpiderfier']
   
   p.spiderListener = (marker) ->
     markerSpiderfied = marker['_omsData']?
-    @['unspiderfy']()
+    @['unspiderfy']() unless markerSpiderfied and @opts['keepSpiderfied']
     if markerSpiderfied
       @trigger('click', marker)
     else
