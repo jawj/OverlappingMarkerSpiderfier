@@ -13,7 +13,7 @@
   this['OverlappingMarkerSpiderfier'] = (function() {
     var ge, gm, lcH, lcU, mt, p, twoPi;
     p = _Class.prototype;
-    p['VERSION'] = '0.2.2';
+    p['VERSION'] = '0.2.3';
     /** @const */
     gm = google.maps;
     /** @const */
@@ -178,7 +178,9 @@
     p.spiderListener = function(marker) {
       var m, mPt, markerPt, markerSpiderfied, nearbyMarkerData, nonNearbyMarkers, pxSq, _i, _len, _ref2;
       markerSpiderfied = marker['_omsData'] != null;
-      this['unspiderfy']();
+      if (!(markerSpiderfied && this.opts['keepSpiderfied'])) {
+        this['unspiderfy']();
+      }
       if (markerSpiderfied) {
         return this.trigger('click', marker);
       } else {
