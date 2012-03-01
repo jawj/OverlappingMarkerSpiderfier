@@ -1,105 +1,155 @@
+
+/** @preserve OverlappingMarkerSpiderfier
+https://github.com/jawj/OverlappingMarkerSpiderfier
+Copyright (c) 2011 - 2012 George MacKerron
+Released under the MIT licence: http://opensource.org/licenses/mit-license
+Note: The Google Maps API v3 must be included *before* this code
+*/
+
 (function() {
-  /** @preserve OverlappingMarkerSpiderfier
-  https://github.com/jawj/OverlappingMarkerSpiderfier
-  Copyright (c) 2011 George MacKerron
-  Released under the MIT licence: http://opensource.org/licenses/mit-license
-  Note: The Google Maps API v3 must be included *before* this code
-  */
-  var _ref;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
-  if (((_ref = this['google']) != null ? _ref['maps'] : void 0) == null) {
-    return;
-  }
+  var _ref,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __slice = Array.prototype.slice;
+
+  if (((_ref = this['google']) != null ? _ref['maps'] : void 0) == null) return;
+
   this['OverlappingMarkerSpiderfier'] = (function() {
     var ge, gm, lcH, lcU, mt, p, twoPi;
+
     p = _Class.prototype;
-    p['VERSION'] = '0.2.3';
-    /** @const */
+
+    p['VERSION'] = '0.2.4';
+
+    /** @const
+    */
+
     gm = google.maps;
-    /** @const */
+
+    /** @const
+    */
+
     ge = gm.event;
-    /** @const */
+
+    /** @const
+    */
+
     mt = gm.MapTypeId;
-    /** @const */
+
+    /** @const
+    */
+
     twoPi = Math.PI * 2;
+
+    p['keepSpiderfied'] = false;
+
+    p['markersWontHide'] = false;
+
+    p['markersWontMove'] = false;
+
     p['nearbyDistance'] = 20;
+
     p['circleSpiralSwitchover'] = 9;
+
     p['circleFootSeparation'] = 23;
+
     p['circleStartAngle'] = twoPi / 12;
+
     p['spiralFootSeparation'] = 26;
+
     p['spiralLengthStart'] = 11;
+
     p['spiralLengthFactor'] = 4;
+
     p['spiderfiedZIndex'] = 1000;
+
     p['usualLegZIndex'] = 10;
+
     p['highlightedLegZIndex'] = 20;
+
     p['legWeight'] = 1.5;
+
     p['legColors'] = {
       'usual': {},
       'highlighted': {}
     };
+
     lcU = p['legColors']['usual'];
+
     lcH = p['legColors']['highlighted'];
+
     lcU[mt.HYBRID] = lcU[mt.SATELLITE] = '#fff';
+
     lcH[mt.HYBRID] = lcH[mt.SATELLITE] = '#f00';
+
     lcU[mt.TERRAIN] = lcU[mt.ROADMAP] = '#444';
+
     lcH[mt.TERRAIN] = lcH[mt.ROADMAP] = '#f00';
+
     function _Class(map, opts) {
-      var e, _i, _len, _ref2;
+      var e, k, v, _i, _len, _ref2,
+        _this = this;
       this.map = map;
-      this.opts = opts != null ? opts : {};
+      if (opts == null) opts = {};
+      for (k in opts) {
+        if (!__hasProp.call(opts, k)) continue;
+        v = opts[k];
+        this[k] = v;
+      }
       this.projHelper = new this.constructor.ProjHelper(this.map);
       this.initMarkerArrays();
       this.listeners = {};
       _ref2 = ['click', 'zoom_changed', 'maptypeid_changed'];
       for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
         e = _ref2[_i];
-        ge.addListener(this.map, e, __bind(function() {
-          return this['unspiderfy']();
-        }, this));
+        ge.addListener(this.map, e, function() {
+          return _this['unspiderfy']();
+        });
       }
     }
+
     p.initMarkerArrays = function() {
       this.markers = [];
       return this.markerListenerRefs = [];
     };
+
     p['addMarker'] = function(marker) {
-      var listenerRefs;
+      var listenerRefs,
+        _this = this;
       listenerRefs = [
-        ge.addListener(marker, 'click', __bind(function() {
-          return this.spiderListener(marker);
-        }, this))
+        ge.addListener(marker, 'click', function() {
+          return _this.spiderListener(marker);
+        })
       ];
-      if (!this.opts['markersWontHide']) {
-        listenerRefs.push(ge.addListener(marker, 'visible_changed', __bind(function() {
-          return this.markerChangeListener(marker, false);
-        }, this)));
+      if (!this['markersWontHide']) {
+        listenerRefs.push(ge.addListener(marker, 'visible_changed', function() {
+          return _this.markerChangeListener(marker, false);
+        }));
       }
-      if (!this.opts['markersWontMove']) {
-        listenerRefs.push(ge.addListener(marker, 'position_changed', __bind(function() {
-          return this.markerChangeListener(marker, true);
-        }, this)));
+      if (!this['markersWontMove']) {
+        listenerRefs.push(ge.addListener(marker, 'position_changed', function() {
+          return _this.markerChangeListener(marker, true);
+        }));
       }
       this.markerListenerRefs.push(listenerRefs);
       this.markers.push(marker);
       return this;
     };
+
     p.markerChangeListener = function(marker, positionChanged) {
       if ((marker['_omsData'] != null) && (positionChanged || !marker.getVisible()) && !((this.spiderfying != null) || (this.unspiderfying != null))) {
         return this.unspiderfy(positionChanged ? marker : null);
       }
     };
+
     p['getMarkers'] = function() {
       return this.markers.slice(0, this.markers.length);
     };
+
     p['removeMarker'] = function(marker) {
       var i, listenerRef, listenerRefs, _i, _len;
-      if (marker['_omsData'] != null) {
-        this['unspiderfy']();
-      }
+      if (marker['_omsData'] != null) this['unspiderfy']();
       i = this.arrIndexOf(this.markers, marker);
-      if (i < 0) {
-        return;
-      }
+      if (i < 0) return;
       listenerRefs = this.markerListenerRefs.splice(i, 1)[0];
       for (_i = 0, _len = listenerRefs.length; _i < _len; _i++) {
         listenerRef = listenerRefs[_i];
@@ -108,6 +158,7 @@
       this.markers.splice(i, 1);
       return this;
     };
+
     p['clearMarkers'] = function() {
       var listenerRef, listenerRefs, _i, _j, _len, _len2, _ref2;
       this['unspiderfy']();
@@ -122,23 +173,25 @@
       this.initMarkerArrays();
       return this;
     };
+
     p['addListener'] = function(event, func) {
       var _base, _ref2;
       ((_ref2 = (_base = this.listeners)[event]) != null ? _ref2 : _base[event] = []).push(func);
       return this;
     };
+
     p['removeListener'] = function(event, func) {
       var i;
       i = this.arrIndexOf(this.listeners[event], func);
-      if (!(i < 0)) {
-        this.listeners[event].splice(i, 1);
-      }
+      if (!(i < 0)) this.listeners[event].splice(i, 1);
       return this;
     };
+
     p['clearListeners'] = function(event) {
       this.listeners[event] = [];
       return this;
     };
+
     p.trigger = function() {
       var args, event, func, _i, _len, _ref2, _ref3, _results;
       event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
@@ -150,6 +203,7 @@
       }
       return _results;
     };
+
     p.generatePtsCircle = function(count, centerPt) {
       var angle, angleStep, circumference, i, legLength, _results;
       circumference = this['circleFootSeparation'] * (2 + count);
@@ -162,6 +216,7 @@
       }
       return _results;
     };
+
     p.generatePtsSpiral = function(count, centerPt) {
       var angle, i, legLength, pt, _results;
       legLength = this['spiralLengthStart'];
@@ -175,12 +230,11 @@
       }
       return _results;
     };
+
     p.spiderListener = function(marker) {
       var m, mPt, markerPt, markerSpiderfied, nearbyMarkerData, nonNearbyMarkers, pxSq, _i, _len, _ref2;
       markerSpiderfied = marker['_omsData'] != null;
-      if (!(markerSpiderfied && this.opts['keepSpiderfied'])) {
-        this['unspiderfy']();
-      }
+      if (!(markerSpiderfied && this['keepSpiderfied'])) this['unspiderfy']();
       if (markerSpiderfied) {
         return this.trigger('click', marker);
       } else {
@@ -191,9 +245,7 @@
         _ref2 = this.markers;
         for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
           m = _ref2[_i];
-          if (!(m.getVisible() && (m.map != null))) {
-            continue;
-          }
+          if (!(m.getVisible() && (m.map != null))) continue;
           mPt = this.llToPt(m.position);
           if (this.ptDistanceSq(mPt, markerPt) < pxSq) {
             nearbyMarkerData.push({
@@ -211,22 +263,25 @@
         }
       }
     };
+
     p.makeHighlightListenerFuncs = function(marker) {
+      var _this = this;
       return {
-        highlight: __bind(function() {
+        highlight: function() {
           return marker['_omsData'].leg.setOptions({
-            strokeColor: this['legColors']['highlighted'][this.map.mapTypeId],
-            zIndex: this['highlightedLegZIndex']
+            strokeColor: _this['legColors']['highlighted'][_this.map.mapTypeId],
+            zIndex: _this['highlightedLegZIndex']
           });
-        }, this),
-        unhighlight: __bind(function() {
+        },
+        unhighlight: function() {
           return marker['_omsData'].leg.setOptions({
-            strokeColor: this['legColors']['usual'][this.map.mapTypeId],
-            zIndex: this['usualLegZIndex']
+            strokeColor: _this['legColors']['usual'][_this.map.mapTypeId],
+            zIndex: _this['usualLegZIndex']
           });
-        }, this)
+        }
       };
     };
+
     p.spiderfy = function(markerData, nonNearbyMarkers) {
       var bodyPt, footLl, footPt, footPts, highlightListenerFuncs, leg, marker, md, nearestMarkerDatum, numFeet, spiderfiedMarkers;
       this.spiderfying = true;
@@ -242,14 +297,15 @@
       })());
       footPts = numFeet >= this['circleSpiralSwitchover'] ? this.generatePtsSpiral(numFeet, bodyPt).reverse() : this.generatePtsCircle(numFeet, bodyPt);
       spiderfiedMarkers = (function() {
-        var _i, _len, _results;
+        var _i, _len, _results,
+          _this = this;
         _results = [];
         for (_i = 0, _len = footPts.length; _i < _len; _i++) {
           footPt = footPts[_i];
           footLl = this.ptToLl(footPt);
-          nearestMarkerDatum = this.minExtract(markerData, __bind(function(md) {
-            return this.ptDistanceSq(md.markerPt, footPt);
-          }, this));
+          nearestMarkerDatum = this.minExtract(markerData, function(md) {
+            return _this.ptDistanceSq(md.markerPt, footPt);
+          });
           marker = nearestMarkerDatum.marker;
           leg = new gm.Polyline({
             map: this.map,
@@ -279,14 +335,11 @@
       this.spiderfied = true;
       return this.trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers);
     };
+
     p['unspiderfy'] = function(markerNotToMove) {
       var listeners, marker, nonNearbyMarkers, unspiderfiedMarkers, _i, _len, _ref2;
-      if (markerNotToMove == null) {
-        markerNotToMove = null;
-      }
-      if (this.spiderfied == null) {
-        return;
-      }
+      if (markerNotToMove == null) markerNotToMove = null;
+      if (this.spiderfied == null) return;
       this.unspiderfying = true;
       unspiderfiedMarkers = [];
       nonNearbyMarkers = [];
@@ -315,12 +368,14 @@
       this.trigger('unspiderfy', unspiderfiedMarkers, nonNearbyMarkers);
       return this;
     };
+
     p.ptDistanceSq = function(pt1, pt2) {
       var dx, dy;
       dx = pt1.x - pt2.x;
       dy = pt1.y - pt2.y;
       return dx * dx + dy * dy;
     };
+
     p.ptAverage = function(pts) {
       var numPts, pt, sumX, sumY, _i, _len;
       sumX = sumY = 0;
@@ -332,12 +387,15 @@
       numPts = pts.length;
       return new gm.Point(sumX / numPts, sumY / numPts);
     };
+
     p.llToPt = function(ll) {
       return this.projHelper.getProjection().fromLatLngToDivPixel(ll);
     };
+
     p.ptToLl = function(ll) {
       return this.projHelper.getProjection().fromDivPixelToLatLng(ll);
     };
+
     p.minExtract = function(set, func) {
       var bestIndex, bestVal, index, item, val, _len;
       for (index = 0, _len = set.length; index < _len; index++) {
@@ -350,24 +408,27 @@
       }
       return set.splice(bestIndex, 1)[0];
     };
+
     p.arrIndexOf = function(arr, obj) {
       var i, o, _len;
-      if (arr.indexOf != null) {
-        return arr.indexOf(obj);
-      }
+      if (arr.indexOf != null) return arr.indexOf(obj);
       for (i = 0, _len = arr.length; i < _len; i++) {
         o = arr[i];
-        if (o === obj) {
-          return i;
-        }
+        if (o === obj) return i;
       }
       return -1;
     };
+
     _Class.ProjHelper = function(map) {
       return this.setMap(map);
     };
+
     _Class.ProjHelper.prototype = new gm.OverlayView();
+
     _Class.ProjHelper.prototype['draw'] = function() {};
+
     return _Class;
+
   })();
+
 }).call(this);
