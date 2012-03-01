@@ -111,18 +111,6 @@ This is the lowest number of markers that will be fanned out into a spiral inste
 
 This determines the thickness of the lines joining spiderfied markers to their original locations. 
 
-*legColors.usual[mapType]* and *legColors.highlighted[mapType]*
-
-These determine the usual and highlighted colours of those lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants. 
-
-The defaults are as follows:
-
-bc. var mti = google.maps.MapTypeId;
-legColors.usual[mti.HYBRID] = legColors.usual[mti.SATELLITE] = '#fff';
-legColors.usual[mti.TERRAIN] = legColors.usual[mti.ROADMAP] = '#444';
-legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] = 
-  legColors.highlighted[mti.TERRAIN] = legColors.highlighted[mti.ROADMAP] = '#f00';
-
 h3. Instance methods: managing markers
 
 Note: methods that have no obvious return value return the OverlappingMarkerSpiderfier instance they were called on, in case you want to chain method calls.
@@ -166,6 +154,24 @@ Removes all listeners on the specified event.
 bc. unspiderfy()
 
 Returns any spiderfied markers to their original positions, and triggers any listeners you may have set for this event. Unless no markers are spiderfied, in which case it does nothing.
+
+h3. Properties
+
+You can set the following properties on an OverlappingMarkerSpiderfier instance:
+
+*legColors.usual[mapType]* and *legColors.highlighted[mapType]*
+
+These determine the usual and highlighted colours of the lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants. 
+
+The defaults are as follows:
+
+bc. var mti = google.maps.MapTypeId;
+legColors.usual[mti.HYBRID] = legColors.usual[mti.SATELLITE] = '#fff';
+legColors.usual[mti.TERRAIN] = legColors.usual[mti.ROADMAP] = '#444';
+legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] = 
+  legColors.highlighted[mti.TERRAIN] = legColors.highlighted[mti.ROADMAP] = '#f00';
+
+You can also get and set any of the options noted in the constructor function documentation above as properties on an OverlappingMarkerSpiderfier instance. However, for some of these options (e.g. @markersWontMove@) modifications won't be applied retroactively.
 
 h2. Licence
 
