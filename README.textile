@@ -83,22 +83,45 @@ bc. new OverlappingMarkerSpiderfier(map, options)
 
 Creates an instance associated with @map@ (a @google.maps.Map@).
 
-The @options@ argument is an optional @Object@ with three available boolean properties.
+The @options@ argument is an optional @Object@ specifying any options you want changed from their defaults. The available options are:
 
-*@markersWontMove@ and @markersWontHide@*
+*@markersWontMove@* and *@markersWontHide@* (defaults: @false@)
 
 By default, change events for each added marker's @position@ and @visibility@ are observed (so that, if a spiderfied marker is moved or hidden, all spiderfied markers are unspiderfied, and the new position is respected where applicable).
 
-However, if you know that you won't be moving and/or hiding any of the markers you add to this instance, you can save memory (a closure per marker in each case) by setting properties named @markersWontMove@ and/or @markersWontHide@ to @true@ (or anything "truthy":http://isolani.co.uk/blog/javascript/TruthyFalsyAndTypeCasting).
+However, if you know that you won't be moving and/or hiding any of the markers you add to this instance, you can save memory (a closure per marker in each case) by setting the options named @markersWontMove@ and/or @markersWontHide@ to @true@ (or anything "truthy":http://isolani.co.uk/blog/javascript/TruthyFalsyAndTypeCasting).
 
 For example, @var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true});@.
 
-*@keepSpiderfied@*
+*@keepSpiderfied@* (default: @false@)
 
 By default, the OverlappingMarkerSpiderfier works like Google Earth, in that when you click a spiderfied marker, the markers unspiderfy before any other action takes place. 
 
 Since this can make it tricky for the user to work through a set of markers one by one, you can override this behaviour by setting the @keepSpiderfied@ option to @true@.
 
+*@nearbyDistance@* (default: @20@).
+
+This is the pixel radius within which a marker is considered to be overlapping a clicked marker.
+
+@circleSpiralSwitchover@ (default: @9@)
+
+This is the lowest number of markers that will be fanned out into a spiral instead of a circle. Set this to @0@ to always get spirals, or @Infinity@ for all circles.
+
+@legWeight@ (default: @1.5@) 
+
+This determines the thickness of the lines joining spiderfied markers to their original locations. 
+
+@legColors.usual[mapType]@ and @legColors.highlighted[mapType]@
+
+These determine the usual and highlighted colours of those lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants. 
+
+The defaults are as follows:
+
+bc. var mti = google.maps.MapTypeId;
+legColors.usual[mti.HYBRID] = legColors.usual[mti.SATELLITE] = '#fff';
+legColors.usual[mti.TERRAIN] = legColors.usual[mti.ROADMAP] = '#444';
+legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] = 
+  legColors.highlighted[mti.TERRAIN] = legColors.highlighted[mti.ROADMAP] = '#f00';
 
 h3. Instance methods: managing markers
 
@@ -143,24 +166,6 @@ Removes all listeners on the specified event.
 bc. unspiderfy()
 
 Returns any spiderfied markers to their original positions, and triggers any listeners you may have set for this event. Unless no markers are spiderfied, in which case it does nothing.
-
-h3. Properties
-
-There are various properties you can set on an @OverlappingMarkerSpiderfier@ instance. The most useful are probably:
-
-@nearbyDistance@, which is the pixel radius within which a marker is considered to be overlapping a clicked marker. Default: @20@.
-
-@circleSpiralSwitchover@, which is the lowest number of markers that will be fanned out into a spiral instead of a circle. Set this to @0@ to always get spirals, or @Infinity@ for all circles. Default: @9@.
-
-@legWeight@, which determines the thickness of the lines joining spiderfied markers to their original locations. Default: @1.5@.
-
-@legColors.usual[mapType]@ and @legColors.highlighted[mapType]@, which determine the usual and highlighted colours of those lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants. Defaults:
-
-bc. var mti = google.maps.MapTypeId;
-legColors.usual[mti.HYBRID] = legColors.usual[mti.SATELLITE] = '#fff';
-legColors.usual[mti.TERRAIN] = legColors.usual[mti.ROADMAP] = '#444';
-legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] = 
-  legColors.highlighted[mti.TERRAIN] = legColors.highlighted[mti.ROADMAP] = '#f00';
 
 h2. Licence
 

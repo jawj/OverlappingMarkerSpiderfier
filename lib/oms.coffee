@@ -1,6 +1,6 @@
 ###* @preserve OverlappingMarkerSpiderfier
 https://github.com/jawj/OverlappingMarkerSpiderfier
-Copyright (c) 2011 George MacKerron
+Copyright (c) 2011 - 2012 George MacKerron
 Released under the MIT licence: http://opensource.org/licenses/mit-license
 Note: The Google Maps API v3 must be included *before* this code
 ###
@@ -11,12 +11,16 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.3'
+  p['VERSION'] = '0.2.4'
   
   ###* @const ### gm = google.maps
   ###* @const ### ge = gm.event
   ###* @const ### mt = gm.MapTypeId
   ###* @const ### twoPi = Math.PI * 2
+  
+  p['keepSpiderfied']  = no          # yes -> don't unspiderfy when a marker is selected
+  p['markersWontHide'] = no          # yes -> a promise you won't hide markers, so we needn't check
+  p['markersWontMove'] = no          # yes -> a promise you won't move markers, so we needn't check
 
   p['nearbyDistance'] = 20           # spiderfy markers within this range of the one clicked, in px
   
@@ -46,7 +50,8 @@ class @['OverlappingMarkerSpiderfier']
   
   # Note: it's OK that this constructor comes after the properties, because a function defined by a 
   # function declaration can be used before the function declaration itself
-  constructor: (@map, @opts = {}) ->  # available opts: keepSpiderfied, markersWontHide, markersWontMove
+  constructor: (@map, opts = {}) ->
+    (@[k] = v) for own k, v of opts
     @projHelper = new @constructor.ProjHelper(@map)
     @initMarkerArrays()
     @listeners = {}
@@ -59,9 +64,9 @@ class @['OverlappingMarkerSpiderfier']
     
   p['addMarker'] = (marker) ->
     listenerRefs = [ge.addListener(marker, 'click', => @spiderListener(marker))]
-    unless @opts['markersWontHide']
+    unless @['markersWontHide']
       listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
-    unless @opts['markersWontMove']
+    unless @['markersWontMove']
       listenerRefs.push(ge.addListener(marker, 'position_changed', => @markerChangeListener(marker, yes)))
     @markerListenerRefs.push(listenerRefs)
     @markers.push(marker)
@@ -128,7 +133,7 @@ class @['OverlappingMarkerSpiderfier']
   
   p.spiderListener = (marker) ->
     markerSpiderfied = marker['_omsData']?
-    @['unspiderfy']() unless markerSpiderfied and @opts['keepSpiderfied']
+    @['unspiderfy']() unless markerSpiderfied and @['keepSpiderfied']
     if markerSpiderfied
       @trigger('click', marker)
     else
