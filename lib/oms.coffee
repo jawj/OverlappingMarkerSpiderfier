@@ -13,10 +13,10 @@ class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
   p['VERSION'] = '0.2.4'
   
-  ###* @const ### gm = google.maps
-  ###* @const ### ge = gm.event
-  ###* @const ### mt = gm.MapTypeId
-  ###* @const ### twoPi = Math.PI * 2
+  gm = google.maps
+  ge = gm.event
+  mt = gm.MapTypeId
+  twoPi = Math.PI * 2
   
   p['keepSpiderfied']  = no          # yes -> don't unspiderfy when a marker is selected
   p['markersWontHide'] = no          # yes -> a promise you won't hide markers, so we needn't check
