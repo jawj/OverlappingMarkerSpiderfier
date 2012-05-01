@@ -162,7 +162,7 @@ You can set the following properties on an OverlappingMarkerSpiderfier instance:
 
 *legColors.usual[mapType]* and *legColors.highlighted[mapType]*
 
-These determine the usual and highlighted colours of the lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants. 
+These determine the usual and highlighted colours of the lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants ("or a custom map type ID":https://github.com/jawj/OverlappingMarkerSpiderfier/issues/4). 
 
 The defaults are as follows:
 
