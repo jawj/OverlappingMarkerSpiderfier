@@ -63,6 +63,8 @@ class @['OverlappingMarkerSpiderfier']
     @markerListenerRefs = []
     
   p['addMarker'] = (marker) ->
+    i = @arrIndexOf(@markers, marker)
+    return @ if i != -1
     listenerRefs = [ge.addListener(marker, 'click', => @spiderListener(marker))]
     unless @['markersWontHide']
       listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
