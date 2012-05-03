@@ -84,7 +84,7 @@ class @['OverlappingMarkerSpiderfier']
   p['removeMarker'] = (marker) ->
     @['unspiderfy']() if marker['_omsData']?  # otherwise it'll be stuck there forever!
     i = @arrIndexOf(@markers, marker)
-    return if i < 0
+    return @ if i < 0
     listenerRefs = @markerListenerRefs.splice(i, 1)[0]
     ge.removeListener(listenerRef) for listenerRef in listenerRefs
     @markers.splice(i, 1)
@@ -200,7 +200,7 @@ class @['OverlappingMarkerSpiderfier']
     @trigger('spiderfy', spiderfiedMarkers, nonNearbyMarkers)
   
   p['unspiderfy'] = (markerNotToMove = null) ->
-    return unless @spiderfied?
+    return @ unless @spiderfied?
     @unspiderfying = yes
     unspiderfiedMarkers = []
     nonNearbyMarkers = []
