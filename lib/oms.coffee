@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.4'
+  p['VERSION'] = '0.2.5'
   
   gm = google.maps
   ge = gm.event
@@ -62,9 +62,8 @@ class @['OverlappingMarkerSpiderfier']
     @markers = []
     @markerListenerRefs = []
     
-  p['addMarker'] = (marker) ->
-    i = @arrIndexOf(@markers, marker)
-    return @ if i != -1
+  p['addMarker'] = (marker, skipDupeCheck = no) ->
+    return @ unless skipDupeCheck or @arrIndexOf(@markers, marker) is -1
     listenerRefs = [ge.addListener(marker, 'click', => @spiderListener(marker))]
     unless @['markersWontHide']
       listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
@@ -78,8 +77,7 @@ class @['OverlappingMarkerSpiderfier']
     if marker['_omsData']? and (positionChanged or not marker.getVisible()) and not (@spiderfying? or @unspiderfying?)
       @unspiderfy(if positionChanged then marker else null)
       
-  p['getMarkers'] = ->
-    @markers[0...@markers.length]  # returns a copy, so no funny business
+  p['getMarkers'] = -> @markers[0..]  # returns a copy, so no funny business
 
   p['removeMarker'] = (marker) ->
     @['unspiderfy']() if marker['_omsData']?  # otherwise it'll be stuck there forever!
@@ -150,7 +148,7 @@ class @['OverlappingMarkerSpiderfier']
           nearbyMarkerData.push(marker: m, markerPt: mPt)
         else
           nonNearbyMarkers.push(m)
-      if nearbyMarkerData.length == 1  # 1 => the one clicked => none nearby
+      if nearbyMarkerData.length is 1  # 1 => the one clicked => none nearby
         @trigger('click', marker)
       else
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
@@ -186,7 +184,7 @@ class @['OverlappingMarkerSpiderfier']
       marker['_omsData'] = 
         usualPosition: marker.position
         leg: leg
-      unless @['legColors']['highlighted'][@map.mapTypeId] ==
+      unless @['legColors']['highlighted'][@map.mapTypeId] is
              @['legColors']['usual'][@map.mapTypeId]
         highlightListenerFuncs = @makeHighlightListenerFuncs(marker)
         marker['_omsData'].hightlightListeners =
@@ -207,7 +205,7 @@ class @['OverlappingMarkerSpiderfier']
     for marker in @markers
       if marker['_omsData']?
         marker['_omsData'].leg.setMap(null)
-        marker.setPosition(marker['_omsData'].usualPosition) unless marker == markerNotToMove
+        marker.setPosition(marker['_omsData'].usualPosition) unless marker is markerNotToMove
         marker.setZIndex(null)
         listeners = marker['_omsData'].hightlightListeners
         if listeners?
@@ -247,7 +245,7 @@ class @['OverlappingMarkerSpiderfier']
     
   p.arrIndexOf = (arr, obj) -> 
     return arr.indexOf(obj) if arr.indexOf?
-    (return i if o == obj) for o, i in arr
+    (return i if o is obj) for o, i in arr
     -1
   
   # the ProjHelper object is just used to get the map's projection
