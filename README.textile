@@ -116,9 +116,11 @@ h3. Instance methods: managing markers
 
 Note: methods that have no obvious return value return the OverlappingMarkerSpiderfier instance they were called on, in case you want to chain method calls.
 
-bc. addMarker(marker)
+bc. addMarker(marker, skipDupeCheck = false)
 
-Adds @marker@ (a @google.maps.Marker@) to be tracked.
+Adds @marker@ (a @google.maps.Marker@) to be tracked. 
+
+Ordinarily the library will first check that the marker is not already being tracked but, if you know that it isn't, you can skip this check and save some CPU cycles by passing *true* as the optional second argument.
 
 bc. removeMarker(marker)
 
