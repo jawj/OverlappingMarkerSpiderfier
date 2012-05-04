@@ -22,7 +22,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p = _Class.prototype;
 
-    p['VERSION'] = '0.2.4';
+    p['VERSION'] = '0.2.5';
 
     gm = google.maps;
 
@@ -106,9 +106,15 @@ Note: The Google Maps API v3 must be included *before* this code
       return this.markerListenerRefs = [];
     };
 
-    p['addMarker'] = function(marker) {
+    p['addMarker'] = function(marker, skipDupeCheck) {
       var listenerRefs,
         _this = this;
+      if (skipDupeCheck == null) {
+        skipDupeCheck = false;
+      }
+      if (!(skipDupeCheck || this.arrIndexOf(this.markers, marker) === -1)) {
+        return this;
+      }
       listenerRefs = [
         ge.addListener(marker, 'click', function() {
           return _this.spiderListener(marker);
@@ -136,7 +142,7 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p['getMarkers'] = function() {
-      return this.markers.slice(0, this.markers.length);
+      return this.markers.slice(0);
     };
 
     p['removeMarker'] = function(marker) {
@@ -146,7 +152,7 @@ Note: The Google Maps API v3 must be included *before* this code
       }
       i = this.arrIndexOf(this.markers, marker);
       if (i < 0) {
-        return;
+        return this;
       }
       listenerRefs = this.markerListenerRefs.splice(i, 1)[0];
       for (_i = 0, _len = listenerRefs.length; _i < _len; _i++) {
@@ -346,7 +352,7 @@ Note: The Google Maps API v3 must be included *before* this code
         markerNotToMove = null;
       }
       if (this.spiderfied == null) {
-        return;
+        return this;
       }
       this.unspiderfying = true;
       unspiderfiedMarkers = [];
