@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.5'
+  p['VERSION'] = '0.2.6'
   
   gm = google.maps
   ge = gm.event
@@ -134,7 +134,7 @@ class @['OverlappingMarkerSpiderfier']
   p.spiderListener = (marker) ->
     markerSpiderfied = marker['_omsData']?
     @['unspiderfy']() unless markerSpiderfied and @['keepSpiderfied']
-    if markerSpiderfied
+    if markerSpiderfied or @map.getStreetView().getVisible()  # don't spiderfy in Street View!
       @trigger('click', marker)
     else
       nearbyMarkerData = []
