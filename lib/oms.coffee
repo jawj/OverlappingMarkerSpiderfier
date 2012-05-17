@@ -62,8 +62,9 @@ class @['OverlappingMarkerSpiderfier']
     @markers = []
     @markerListenerRefs = []
     
-  p['addMarker'] = (marker, skipDupeCheck = no) ->
-    return @ unless skipDupeCheck or @arrIndexOf(@markers, marker) is -1
+  p['addMarker'] = (marker) ->
+    return @ if marker['_oms']?
+    marker['_oms'] = yes
     listenerRefs = [ge.addListener(marker, 'click', => @spiderListener(marker))]
     unless @['markersWontHide']
       listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
@@ -85,13 +86,16 @@ class @['OverlappingMarkerSpiderfier']
     return @ if i < 0
     listenerRefs = @markerListenerRefs.splice(i, 1)[0]
     ge.removeListener(listenerRef) for listenerRef in listenerRefs
+    delete marker['_oms']
     @markers.splice(i, 1)
     @  # return self, for chaining
     
   p['clearMarkers'] = ->
     @['unspiderfy']()
-    for listenerRefs in @markerListenerRefs
+    for marker, i in @markers
+      listenerRefs = @markerListenerRefs[i]
       ge.removeListener(listenerRef) for listenerRef in listenerRefs
+      delete marker['_oms']
     @initMarkerArrays()
     @  # return self, for chaining
         
