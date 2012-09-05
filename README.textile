@@ -146,7 +146,7 @@ bc. markersThatWillAndWontSpiderfy()
 
 Returns an array of two arrays. The first array contains all markers that will be spiderfied when clicked — i.e. that are within @nearbyDistance@ pixels of any other marker. The second array contains all those that won't be.
 
-If you're using CoffeeScript, this plays nicely with destructuring assignment: you can just write @[will, wont] = oms.markersThatWillAndWontSpiderfy()@.
+If you're using CoffeeScript, this plays nicely with "destructuring assignment":http://jashkenas.github.com/coffee-script/#destructuring: you can just write @[will, wont] = oms.markersThatWillAndWontSpiderfy()@.
 
 Don't cache these arrays — or if you do, be sure to invalidate the cache when the zoom level changes and when any marker is added, moved, hidden or removed.
 
