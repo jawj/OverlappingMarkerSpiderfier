@@ -22,7 +22,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p = _Class.prototype;
 
-    p['VERSION'] = '0.2.6';
+    p['VERSION'] = '0.2.7';
 
     gm = google.maps;
 
@@ -239,7 +239,7 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p.spiderListener = function(marker) {
-      var m, mPt, markerPt, markerSpiderfied, nearbyMarkerData, nonNearbyMarkers, pxSq, _i, _len, _ref1;
+      var m, mPt, markerPt, markerSpiderfied, nDist, nearbyMarkerData, nonNearbyMarkers, pxSq, _i, _len, _ref1;
       markerSpiderfied = marker['_omsData'] != null;
       if (!(markerSpiderfied && this['keepSpiderfied'])) {
         this['unspiderfy']();
@@ -249,12 +249,13 @@ Note: The Google Maps API v3 must be included *before* this code
       } else {
         nearbyMarkerData = [];
         nonNearbyMarkers = [];
-        pxSq = this['nearbyDistance'] * this['nearbyDistance'];
+        nDist = this['nearbyDistance'];
+        pxSq = nDist * nDist;
         markerPt = this.llToPt(marker.position);
         _ref1 = this.markers;
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           m = _ref1[_i];
-          if (!(m.getVisible() && (m.map != null))) {
+          if (!((m.map != null) && m.getVisible())) {
             continue;
           }
           mPt = this.llToPt(m.position);
@@ -273,6 +274,82 @@ Note: The Google Maps API v3 must be included *before* this code
           return this.spiderfy(nearbyMarkerData, nonNearbyMarkers);
         }
       }
+    };
+
+    p['willSpiderfy'] = function(marker) {
+      var m, mPt, markerPt, nDist, pxSq, _i, _len, _ref1, _ref2, _ref3;
+      nDist = this['nearbyDistance'];
+      pxSq = nDist * nDist;
+      markerPt = this.llToPt(marker.position);
+      _ref1 = this.markers;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        m = _ref1[_i];
+        if (m === marker || !(m.map != null) || !m.getVisible()) {
+          continue;
+        }
+        mPt = this.llToPt((_ref2 = (_ref3 = m['_omsData']) != null ? _ref3.usualPosition : void 0) != null ? _ref2 : m.position);
+        if (this.ptDistanceSq(mPt, markerPt) < pxSq) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    p['markersThatWillSpiderfy'] = function() {
+      var i, i1, i2, m, m1, m1Data, m2, m2Data, mData, nDist, pxSq, _i, _j, _k, _len, _len1, _len2, _ref1, _ref2, _ref3, _results;
+      nDist = this['nearbyDistance'];
+      pxSq = nDist * nDist;
+      mData = (function() {
+        var _i, _len, _ref1, _ref2, _ref3, _results;
+        _ref1 = this.markers;
+        _results = [];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          m = _ref1[_i];
+          _results.push({
+            pt: this.llToPt((_ref2 = (_ref3 = m['_omsData']) != null ? _ref3.usualPosition : void 0) != null ? _ref2 : m.position),
+            willSpiderfy: false
+          });
+        }
+        return _results;
+      }).call(this);
+      _ref1 = this.markers;
+      for (i1 = _i = 0, _len = _ref1.length; _i < _len; i1 = ++_i) {
+        m1 = _ref1[i1];
+        if (!((m1.map != null) && m1.getVisible())) {
+          continue;
+        }
+        m1Data = mData[i1];
+        if (m1Data.willSpiderfy) {
+          continue;
+        }
+        _ref2 = this.markers;
+        for (i2 = _j = 0, _len1 = _ref2.length; _j < _len1; i2 = ++_j) {
+          m2 = _ref2[i2];
+          if (i2 === i1) {
+            continue;
+          }
+          if (!((m2.map != null) && m2.getVisible())) {
+            continue;
+          }
+          m2Data = mData[i2];
+          if (i2 < i1 && !m2Data.willSpiderfy) {
+            continue;
+          }
+          if (this.ptDistanceSq(m1Data.pt, m2Data.pt) < pxSq) {
+            m1Data.willSpiderfy = m2Data.willSpiderfy = true;
+            break;
+          }
+        }
+      }
+      _ref3 = this.markers;
+      _results = [];
+      for (i = _k = 0, _len2 = _ref3.length; _k < _len2; i = ++_k) {
+        m = _ref3[i];
+        if (mData[i].willSpiderfy) {
+          _results.push(m);
+        }
+      }
+      return _results;
     };
 
     p.makeHighlightListenerFuncs = function(marker) {
