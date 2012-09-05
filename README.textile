@@ -140,7 +140,7 @@ bc. willSpiderfy(marker)
 
 Returns @true@ if the marker passed as an argument will be spiderfied when clicked — i.e. if it is within @nearbyDistance@ pixels of any other marker. Don't cache this — or if you do, be sure to invalidate the cache when the zoom level changes and when any marker is added, moved, hidden or removed.
 
-Also, *don't* call this in a loop over all your markers, since this can take a *very* long time. Call @markersThatWillSpiderfy@ instead.
+Also, *don't* call this in a loop over all your markers, since this can take a *very* long time. Call @markersThatWillAndWontSpiderfy@ instead.
 
 bc. markersThatWillAndWontSpiderfy()
 
