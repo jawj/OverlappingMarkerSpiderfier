@@ -22,7 +22,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p = _Class.prototype;
 
-    p['VERSION'] = '0.2.7';
+    p['VERSION'] = '0.2.8';
 
     gm = google.maps;
 
@@ -295,8 +295,8 @@ Note: The Google Maps API v3 must be included *before* this code
       return false;
     };
 
-    p['markersThatWillSpiderfy'] = function() {
-      var i, i1, i2, m, m1, m1Data, m2, m2Data, mData, nDist, pxSq, _i, _j, _k, _len, _len1, _len2, _ref1, _ref2, _ref3, _results;
+    p['markersThatWillAndWontSpiderfy'] = function() {
+      var i, i1, i2, m, m1, m1Data, m2, m2Data, mData, nDist, pxSq, will, wont, _i, _j, _k, _len, _len1, _len2, _ref1, _ref2, _ref3;
       nDist = this['nearbyDistance'];
       pxSq = nDist * nDist;
       mData = (function() {
@@ -341,15 +341,14 @@ Note: The Google Maps API v3 must be included *before* this code
           }
         }
       }
+      will = [];
+      wont = [];
       _ref3 = this.markers;
-      _results = [];
       for (i = _k = 0, _len2 = _ref3.length; _k < _len2; i = ++_k) {
         m = _ref3[i];
-        if (mData[i].willSpiderfy) {
-          _results.push(m);
-        }
+        (mData[i].willSpiderfy ? will : wont).push(m);
       }
-      return _results;
+      return [will, wont];
     };
 
     p.makeHighlightListenerFuncs = function(marker) {
