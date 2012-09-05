@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.6'
+  p['VERSION'] = '0.2.7'
   
   gm = google.maps
   ge = gm.event
@@ -143,10 +143,11 @@ class @['OverlappingMarkerSpiderfier']
     else
       nearbyMarkerData = []
       nonNearbyMarkers = []
-      pxSq = @['nearbyDistance'] * @['nearbyDistance']
+      nDist = @['nearbyDistance']
+      pxSq = nDist * nDist
       markerPt = @llToPt(marker.position)
       for m in @markers
-        continue unless m.getVisible() and m.map?  # at 2011-08-12, property m.visible is undefined in API v3.5
+        continue unless m.map? and m.getVisible()  # at 2011-08-12, property m.visible is undefined in API v3.5
         mPt = @llToPt(m.position)
         if @ptDistanceSq(mPt, markerPt) < pxSq
           nearbyMarkerData.push(marker: m, markerPt: mPt)
@@ -156,6 +157,35 @@ class @['OverlappingMarkerSpiderfier']
         @trigger('click', marker)
       else
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
+  
+  p['willSpiderfy'] = (marker) ->
+    nDist = @['nearbyDistance']
+    pxSq = nDist * nDist
+    markerPt = @llToPt(marker.position)
+    for m in @markers
+      continue if m is marker or not m.map? or not m.getVisible()
+      mPt = @llToPt(m['_omsData']?.usualPosition ? m.position)
+      return yes if @ptDistanceSq(mPt, markerPt) < pxSq
+    no
+          
+  p['markersThatWillSpiderfy'] = ->  # *very* much quicker than calling willSpiderfy in a loop
+    nDist = @['nearbyDistance']
+    pxSq = nDist * nDist
+    mData = for m in @markers
+      {pt: @llToPt(m['_omsData']?.usualPosition ? m.position), willSpiderfy: no}
+    for m1, i1 in @markers
+      continue unless m1.map? and m1.getVisible()
+      m1Data = mData[i1]
+      continue if m1Data.willSpiderfy
+      for m2, i2 in @markers
+        continue if i2 is i1
+        continue unless m2.map? and m2.getVisible()
+        m2Data = mData[i2]
+        continue if i2 < i1 and not m2Data.willSpiderfy
+        if @ptDistanceSq(m1Data.pt, m2Data.pt) < pxSq
+          m1Data.willSpiderfy = m2Data.willSpiderfy = yes
+          break
+    m for m, i in @markers when mData[i].willSpiderfy
   
   p.makeHighlightListenerFuncs = (marker) ->
     highlight: 

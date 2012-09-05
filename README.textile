@@ -136,6 +136,19 @@ bc. getMarkers()
 
 Returns an @Array@ of all the markers that are currently being tracked. This is a copy of the one used internally, so you can do what you like with it.
 
+bc. willSpiderfy(marker)
+
+Returns @true@ if the marker passed as an argument will be spiderfied when clicked — i.e. if it is within @nearbyDistance@ pixels of any other marker. Don't cache this — or if you do, be sure to invalidate the cache when the zoom level changes and when any marker is added, moved, hidden or removed.
+
+Also, *don't* call this in a loop over all your markers, since this can take a *very* long time. Call @markersThatWillSpiderfy@ instead.
+
+bc. markersThatWillSpiderfy()
+
+Returns an array of all markers that will be spiderfied when clicked — i.e. that are within @nearbyDistance@ pixels of any other marker. Don't cache this — or if you do, be sure to invalidate the cache when the zoom level changes and when any marker is added, moved, hidden or removed.
+
+This method is several orders of magnitude faster than looping over all markers calling @willSpiderfy@ (primarily because it only does the expensive business of converting lat/lons to pixel coordinates once per marker).
+
+
 h3. Instance methods: managing listeners
 
 bc. addListener(event, listenerFunc)
