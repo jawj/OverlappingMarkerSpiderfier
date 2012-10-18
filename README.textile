@@ -211,4 +211,4 @@ h2. Licence
 
 This software is released under the "MIT licence":http://www.opensource.org/licenses/mit-license.php.
 
-Finally, if you want to say thanks, I am on "Gittip":https://www.gittip.com/jawj
+Finally, if you want to say thanks, I am on "Gittip":https://www.gittip.com/jawj.
