@@ -22,7 +22,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p = _Class.prototype;
 
-    p['VERSION'] = '0.2.8';
+    p['VERSION'] = '0.2.9';
 
     gm = google.maps;
 
@@ -278,6 +278,9 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p['willSpiderfy'] = function(marker) {
       var m, mPt, markerPt, nDist, pxSq, _i, _len, _ref1, _ref2, _ref3;
+      if (this.projHelper.getProjection() == null) {
+        throw "Must wait for 'idle' event on map before calling willSpiderfy";
+      }
       nDist = this['nearbyDistance'];
       pxSq = nDist * nDist;
       markerPt = this.llToPt(marker.position);
@@ -297,6 +300,9 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p['markersThatWillAndWontSpiderfy'] = function() {
       var i, i1, i2, m, m1, m1Data, m2, m2Data, mData, nDist, pxSq, will, wont, _i, _j, _k, _len, _len1, _len2, _ref1, _ref2, _ref3;
+      if (this.projHelper.getProjection() == null) {
+        throw "Must wait for 'idle' event on map before calling markersThatWillAndWontSpiderfy";
+      }
       nDist = this['nearbyDistance'];
       pxSq = nDist * nDist;
       mData = (function() {
@@ -483,8 +489,8 @@ Note: The Google Maps API v3 must be included *before* this code
       return this.projHelper.getProjection().fromLatLngToDivPixel(ll);
     };
 
-    p.ptToLl = function(ll) {
-      return this.projHelper.getProjection().fromDivPixelToLatLng(ll);
+    p.ptToLl = function(pt) {
+      return this.projHelper.getProjection().fromDivPixelToLatLng(pt);
     };
 
     p.minExtract = function(set, func) {
