@@ -120,37 +120,21 @@ h3. Instance methods: managing markers
 
 Note: methods that have no obvious return value return the OverlappingMarkerSpiderfier instance they were called on, in case you want to chain method calls.
 
-bc. addMarker(marker)
+*addMarker(marker)*
 
 Adds @marker@ (a @google.maps.Marker@) to be tracked.
 
-bc. removeMarker(marker)
+*removeMarker(marker)*
 
 Removes @marker@ from those being tracked.
 
-bc. clearMarkers()
+*clearMarkers()*
 
 Removes every @marker@ from being tracked. Much quicker than calling @removeMarker@ in a loop, since that has to search the markers array every time.
 
-bc. getMarkers()
+*getMarkers()*
 
 Returns an @Array@ of all the markers that are currently being tracked. This is a copy of the one used internally, so you can do what you like with it.
-
-bc. willSpiderfy(marker)
-
-Returns @true@ if the marker passed as an argument will be spiderfied when clicked — i.e. if it is within @nearbyDistance@ pixels of any other marker. Don't cache this — or if you do, be sure to invalidate the cache when the zoom level changes and when any marker is added, moved, hidden or removed.
-
-Also, *don't* call this in a loop over all your markers, since this can take a *very* long time. Call @markersThatWillAndWontSpiderfy@ instead.
-
-bc. markersThatWillAndWontSpiderfy()
-
-Returns an array of two arrays. The first array contains all markers that will be spiderfied when clicked — i.e. that are within @nearbyDistance@ pixels of any other marker. The second array contains all those that won't be.
-
-If you're using CoffeeScript, this plays nicely with "destructuring assignment":http://jashkenas.github.com/coffee-script/#destructuring: you can just write @[will, wont] = oms.markersThatWillAndWontSpiderfy()@.
-
-Don't cache these arrays — or if you do, be sure to invalidate the cache when the zoom level changes and when any marker is added, moved, hidden or removed.
-
-This method is several orders of magnitude faster than looping over all markers calling @willSpiderfy@ (primarily because it only does the expensive business of converting lat/lons to pixel coordinates once per marker).
 
 
 h3. Instance methods: managing listeners
@@ -176,6 +160,30 @@ Removes all listeners on the specified event.
 bc. unspiderfy()
 
 Returns any spiderfied markers to their original positions, and triggers any listeners you may have set for this event. Unless no markers are spiderfied, in which case it does nothing.
+
+
+h3. Instance methods: advanced use only!
+
+The following two methods allow you to second-guess what will happen when someone clicks a marker. Note that the results of these methods are necessarily dynamic: they may change any time the zoom level changes, and when any marker is added, moved, hidden or removed.
+
+Hence if you're using either method, you'll very likely want call it (and take appropriate action) every time the map's @zoom_changed@ event fires _and_ any time you do something to add, move, hide or remove a marker.
+
+Note also that these methods rely on the map's @Projection@ object being available, and thus cannot be called until the map's first @idle@ event fires.
+
+*willSpiderfy(marker)*
+
+Returns @true@ if the marker passed as an argument will be spiderfied when clicked — i.e. if it is within @nearbyDistance@ pixels of any other marker.
+
+_Don't_ call this in a loop over all your markers, since this can take a _very_ long time. Call @markersThatWillAndWontSpiderfy@ instead.
+
+*markersThatWillAndWontSpiderfy()*
+
+Returns an @Array@ of two @Array@s. The first array contains all markers that will be spiderfied when clicked — i.e. that are within @nearbyDistance@ pixels of any other marker. The second array contains all those that won't be.
+
+If you're using CoffeeScript, this plays nicely with "destructuring assignment":http://jashkenas.github.com/coffee-script/#destructuring: you can just write @[will, wont] = oms.markersThatWillAndWontSpiderfy()@.
+
+This method is several orders of magnitude faster than looping over all markers calling @willSpiderfy@ (primarily because it only does the expensive business of converting lat/lons to pixel coordinates once per marker).
+
 
 h3. Properties
 
