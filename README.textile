@@ -126,20 +126,22 @@ Adds @marker@ (a @google.maps.Marker@) to be tracked.
 
 *removeMarker(marker)*
 
-Removes @marker@ from those being tracked.
+Removes @marker@ from those being tracked. This _does not_ remove the marker from the map (to remove a marker from the map you must call @setMap(null)@ on it, as per usual).
 
 *clearMarkers()*
 
 Removes every @marker@ from being tracked. Much quicker than calling @removeMarker@ in a loop, since that has to search the markers array every time.
 
+This _does not_ remove the markers from the map (to remove the markers from the map you must call @setMap(null)@ on each of them, as per usual).
+
 *getMarkers()*
 
-Returns an @Array@ of all the markers that are currently being tracked. This is a copy of the one used internally, so you can do what you like with it.
+Returns an array of all the markers that are currently being tracked. This is a copy of the one used internally, so you can do what you like with it.
 
 
 h3. Instance methods: managing listeners
 
-bc. addListener(event, listenerFunc)
+*addListener(event, listenerFunc)*
 
 Adds a listener to react to one of three events.
 
@@ -147,42 +149,44 @@ Adds a listener to react to one of three events.
 
 For @'click'@ events, @listenerFunc@ receives one argument: the clicked marker object. You'll probably want to use this listener to do something like show a @google.maps.InfoWindow@.
 
-For @'spiderfy'@ or @'unspiderfy'@ events, @listenerFunc@ receives two arguments: first, an @Array@ of the markers that were spiderfied or unspiderfied; second, an @Array@ of the markers that were not. One use for these listeners is to make some distinction between spiderfied and non-spiderfied markers when some markers are spiderfied -- e.g. highlighting those that are spiderfied, or dimming out those that aren't.
+For @'spiderfy'@ or @'unspiderfy'@ events, @listenerFunc@ receives two arguments: first, an array of the markers that were spiderfied or unspiderfied; second, an array of the markers that were not. One use for these listeners is to make some distinction between spiderfied and non-spiderfied markers when some markers are spiderfied -- e.g. highlighting those that are spiderfied, or dimming out those that aren't.
 
-bc. removeListener(event, listenerFunc)
+*removeListener(event, listenerFunc)*
 
 Removes the specified listener on the specified event.
 
-bc. clearListeners(event)
+*clearListeners(event)*
 
 Removes all listeners on the specified event.
 
-bc. unspiderfy()
+*unspiderfy()*
 
 Returns any spiderfied markers to their original positions, and triggers any listeners you may have set for this event. Unless no markers are spiderfied, in which case it does nothing.
 
 
 h3. Instance methods: advanced use only!
 
-The following two methods allow you to second-guess what will happen when someone clicks a marker. Note that the results of these methods are necessarily dynamic: they may change any time the zoom level changes, and when any marker is added, moved, hidden or removed.
-
-Hence if you're using either method, you'll very likely want call it (and take appropriate action) every time the map's @zoom_changed@ event fires _and_ any time you do something to add, move, hide or remove a marker.
-
-Note also that these methods rely on the map's @Projection@ object being available, and thus cannot be called until the map's first @idle@ event fires.
-
 *willSpiderfy(marker)*
 
 Returns @true@ if the marker passed as an argument will be spiderfied when clicked — i.e. if it is within @nearbyDistance@ pixels of any other marker.
 
-_Don't_ call this in a loop over all your markers, since this can take a _very_ long time. Call @markersThatWillAndWontSpiderfy@ instead.
+_Don't_ call this method in a loop over all your markers, since this can take a _very_ long time. Call @markersThatWillAndWontSpiderfy@ instead.
+
+The return value of this method may change any time the zoom level changes, and when any marker is added, moved, hidden or removed. Hence you'll very likely want call it (and take appropriate action) every time the map's @zoom_changed@ event fires _and_ any time you add, move, hide or remove a marker.
+
+Note also that this method relies on the map's @Projection@ object being available, and thus cannot be called until the map's first @idle@ event fires.
 
 *markersThatWillAndWontSpiderfy()*
 
-Returns an @Array@ of two @Array@s. The first array contains all markers that will be spiderfied when clicked — i.e. that are within @nearbyDistance@ pixels of any other marker. The second array contains all those that won't be.
+Returns an array of two arrays. The first array contains all markers that will be spiderfied when clicked — i.e. that are within @nearbyDistance@ pixels of any other marker. The second array contains all those that won't be.
 
 If you're using CoffeeScript, this plays nicely with "destructuring assignment":http://jashkenas.github.com/coffee-script/#destructuring: you can just write @[will, wont] = oms.markersThatWillAndWontSpiderfy()@.
 
 This method is several orders of magnitude faster than looping over all markers calling @willSpiderfy@ (primarily because it only does the expensive business of converting lat/lons to pixel coordinates once per marker).
+
+The return value of this method may change any time the zoom level changes, and when any marker is added, moved, hidden or removed. Hence you'll very likely want call it (and take appropriate action) every time the map's @zoom_changed@ event fires _and_ any time you add, move, hide or remove a marker.
+
+Note also that this method relies on the map's @Projection@ object being available, and thus cannot be called until the map's first @idle@ event fires.
 
 
 h3. Properties
