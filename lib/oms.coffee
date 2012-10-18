@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.8'
+  p['VERSION'] = '0.2.9'
   
   gm = google.maps
   ge = gm.event
@@ -159,6 +159,8 @@ class @['OverlappingMarkerSpiderfier']
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
   
   p['willSpiderfy'] = (marker) ->
+    unless @projHelper.getProjection()?
+      throw "Must wait for 'idle' event on map before calling willSpiderfy"
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
     markerPt = @llToPt(marker.position)
@@ -169,6 +171,8 @@ class @['OverlappingMarkerSpiderfier']
     no
           
   p['markersThatWillAndWontSpiderfy'] = ->  # *very* much quicker than calling willSpiderfy in a loop
+    unless @projHelper.getProjection()?
+      throw "Must wait for 'idle' event on map before calling markersThatWillAndWontSpiderfy"
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
     mData = for m in @markers
@@ -270,7 +274,7 @@ class @['OverlappingMarkerSpiderfier']
     new gm.Point(sumX / numPts, sumY / numPts)
   
   p.llToPt = (ll) -> @projHelper.getProjection().fromLatLngToDivPixel(ll)
-  p.ptToLl = (ll) -> @projHelper.getProjection().fromDivPixelToLatLng(ll)
+  p.ptToLl = (pt) -> @projHelper.getProjection().fromDivPixelToLatLng(pt)
   
   p.minExtract = (set, func) ->  # destructive! returns minimum, and also removes it from the set
     for item, index in set
