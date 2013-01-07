@@ -75,6 +75,8 @@ bc. for (var i = 0; i < window.mapData.length; i ++) {
 
 h2. Docs
 
+*Please note: version 0.3 introduces a breaking change. The @willSpiderfy(marker)@ and @markersThatWillAndWontSpiderfy()@ methods have been replaced with the (similar, but different) @markersNearMarker(marker)@ and @markersNearAnyOtherMarker()@ methods.*
+
 h3. Loading
 
 The @google.maps@ object must be available when this code runs -- i.e. put the Google Maps API &lt;script&gt; tag before this one.
@@ -166,23 +168,21 @@ Returns any spiderfied markers to their original positions, and triggers any lis
 
 h3. Instance methods: advanced use only!
 
-*willSpiderfy(marker)*
+*markersNearMarker(marker, firstOnly)*
 
-Returns @true@ if the marker passed as an argument will be spiderfied when clicked — i.e. if it is within @nearbyDistance@ pixels of any other marker.
+Returns an array of markers within @nearbyDistance@ pixels of @marker@ -- i.e. those that will be spiderfied when @marker@ is clicked. If you pass @true@ as the second argument, the search will stop when a single marker has been found. This is more efficient if all you want to know is whether there are any nearby markers.
 
-_Don't_ call this method in a loop over all your markers, since this can take a _very_ long time. Call @markersThatWillAndWontSpiderfy@ instead.
+_Don't_ call this method in a loop over all your markers, since this can take a _very_ long time.
 
 The return value of this method may change any time the zoom level changes, and when any marker is added, moved, hidden or removed. Hence you'll very likely want call it (and take appropriate action) every time the map's @zoom_changed@ event fires _and_ any time you add, move, hide or remove a marker.
 
 Note also that this method relies on the map's @Projection@ object being available, and thus cannot be called until the map's first @idle@ event fires.
 
-*markersThatWillAndWontSpiderfy()*
+*markersNearAnyOtherMarker()*
 
-Returns an array of two arrays. The first array contains all markers that will be spiderfied when clicked — i.e. that are within @nearbyDistance@ pixels of any other marker. The second array contains all those that won't be.
+Returns an array of all markers that are near one or more other markers -- i.e. those will be spiderfied when clicked.
 
-If you're using CoffeeScript, this plays nicely with "destructuring assignment":http://jashkenas.github.com/coffee-script/#destructuring: you can just write @[will, wont] = oms.markersThatWillAndWontSpiderfy()@.
-
-This method is several orders of magnitude faster than looping over all markers calling @willSpiderfy@ (primarily because it only does the expensive business of converting lat/lons to pixel coordinates once per marker).
+This method is several orders of magnitude faster than looping over all markers calling @markersNearMarker@ (primarily because it only does the expensive business of converting lat/lons to pixel coordinates once per marker).
 
 The return value of this method may change any time the zoom level changes, and when any marker is added, moved, hidden or removed. Hence you'll very likely want call it (and take appropriate action) every time the map's @zoom_changed@ event fires _and_ any time you add, move, hide or remove a marker.
 
