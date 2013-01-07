@@ -28,6 +28,8 @@ h2. Download
 
 Download "the compiled, minified JS source":http://jawj.github.com/OverlappingMarkerSpiderfier/bin/oms.min.js.
 
+*Please note: version 0.3 introduces a breaking change. The @willSpiderfy(marker)@ and @markersThatWillAndWontSpiderfy()@ methods have been replaced with the (similar, but different) @markersNearMarker(marker)@ and @markersNearAnyOtherMarker()@ methods.*
+
 h2. How to use
 
 See the "demo map source":/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo.html, or follow along here for a slightly simpler usage with commentary.
@@ -74,8 +76,6 @@ bc. for (var i = 0; i < window.mapData.length; i ++) {
 }
 
 h2. Docs
-
-*Please note: version 0.3 introduces a breaking change. The @willSpiderfy(marker)@ and @markersThatWillAndWontSpiderfy()@ methods have been replaced with the (similar, but different) @markersNearMarker(marker)@ and @markersNearAnyOtherMarker()@ methods.*
 
 h3. Loading
 
