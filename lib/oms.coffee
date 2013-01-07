@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.2.8'
+  p['VERSION'] = '0.3'
   
   gm = google.maps
   ge = gm.event
@@ -158,17 +158,20 @@ class @['OverlappingMarkerSpiderfier']
       else
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
   
-  p['willSpiderfy'] = (marker) ->
+  p['markersNearMarker'] = (marker, firstOnly = no) ->
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
     markerPt = @llToPt(marker.position)
+    markers = []
     for m in @markers
       continue if m is marker or not m.map? or not m.getVisible()
       mPt = @llToPt(m['_omsData']?.usualPosition ? m.position)
-      return yes if @ptDistanceSq(mPt, markerPt) < pxSq
-    no
-          
-  p['markersThatWillAndWontSpiderfy'] = ->  # *very* much quicker than calling willSpiderfy in a loop
+      if @ptDistanceSq(mPt, markerPt) < pxSq
+        markers.push(m)
+        break if firstOnly
+    markers
+  
+  p['markersNearAnyOtherMarker'] = ->  # *very* much quicker than calling markersNearMarker in a loop
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
     mData = for m in @markers
@@ -185,10 +188,7 @@ class @['OverlappingMarkerSpiderfier']
         if @ptDistanceSq(m1Data.pt, m2Data.pt) < pxSq
           m1Data.willSpiderfy = m2Data.willSpiderfy = yes
           break
-    will = []
-    wont = []
-    (if mData[i].willSpiderfy then will else wont).push(m) for m, i in @markers
-    [will, wont]
+    m for m, i in @markers when mData[i].willSpiderfy
   
   p.makeHighlightListenerFuncs = (marker) ->
     highlight: 
