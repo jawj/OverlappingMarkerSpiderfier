@@ -159,6 +159,8 @@ class @['OverlappingMarkerSpiderfier']
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
   
   p['markersNearMarker'] = (marker, firstOnly = no) ->
+    unless @projHelper.getProjection()?
+      throw "Must wait for 'idle' event on map before calling markersNearMarker"
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
     markerPt = @llToPt(marker.position)
@@ -172,6 +174,8 @@ class @['OverlappingMarkerSpiderfier']
     markers
   
   p['markersNearAnyOtherMarker'] = ->  # *very* much quicker than calling markersNearMarker in a loop
+    unless @projHelper.getProjection()?
+      throw "Must wait for 'idle' event on map before calling markersNearAnyOtherMarker"
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
     mData = for m in @markers
@@ -270,7 +274,7 @@ class @['OverlappingMarkerSpiderfier']
     new gm.Point(sumX / numPts, sumY / numPts)
   
   p.llToPt = (ll) -> @projHelper.getProjection().fromLatLngToDivPixel(ll)
-  p.ptToLl = (ll) -> @projHelper.getProjection().fromDivPixelToLatLng(ll)
+  p.ptToLl = (pt) -> @projHelper.getProjection().fromDivPixelToLatLng(pt)
   
   p.minExtract = (set, func) ->  # destructive! returns minimum, and also removes it from the set
     for item, index in set
