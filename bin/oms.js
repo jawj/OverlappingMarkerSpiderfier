@@ -21,7 +21,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p = _Class.prototype;
 
-    p['VERSION'] = '0.3.1';
+    p['VERSION'] = '0.3.2';
 
     gm = google.maps;
 
@@ -136,7 +136,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p.markerChangeListener = function(marker, positionChanged) {
       if ((marker['_omsData'] != null) && (positionChanged || !marker.getVisible()) && !((this.spiderfying != null) || (this.unspiderfying != null))) {
-        return this.unspiderfy(positionChanged ? marker : null);
+        return this['unspiderfy'](positionChanged ? marker : null);
       }
     };
 
