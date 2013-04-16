@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.3.1'
+  p['VERSION'] = '0.3.2'
   
   gm = google.maps
   ge = gm.event
@@ -76,7 +76,7 @@ class @['OverlappingMarkerSpiderfier']
 
   p.markerChangeListener = (marker, positionChanged) ->
     if marker['_omsData']? and (positionChanged or not marker.getVisible()) and not (@spiderfying? or @unspiderfying?)
-      @unspiderfy(if positionChanged then marker else null)
+      @['unspiderfy'](if positionChanged then marker else null)
       
   p['getMarkers'] = -> @markers[0..]  # returns a copy, so no funny business
 
