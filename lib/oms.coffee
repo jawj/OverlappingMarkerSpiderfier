@@ -11,7 +11,7 @@ return unless this['google']?['maps']?  # return from wrapper func without doing
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  p['VERSION'] = '0.3.2'
+  x['VERSION'] = '0.3.3' for x in [@, p]  # better on @, but defined on p too for backward-compat
   
   gm = google.maps
   ge = gm.event
@@ -65,7 +65,7 @@ class @['OverlappingMarkerSpiderfier']
   p['addMarker'] = (marker) ->
     return @ if marker['_oms']?
     marker['_oms'] = yes
-    listenerRefs = [ge.addListener(marker, 'click', => @spiderListener(marker))]
+    listenerRefs = [ge.addListener(marker, 'click', (event) => @spiderListener(marker, event))]
     unless @['markersWontHide']
       listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
     unless @['markersWontMove']
@@ -135,11 +135,11 @@ class @['OverlappingMarkerSpiderfier']
       legLength += twoPi * @['spiralLengthFactor'] / angle
       pt
   
-  p.spiderListener = (marker) ->
+  p.spiderListener = (marker, event) ->
     markerSpiderfied = marker['_omsData']?
     @['unspiderfy']() unless markerSpiderfied and @['keepSpiderfied']
     if markerSpiderfied or @map.getStreetView().getVisible() or @map.getMapTypeId() is 'GoogleEarthAPI'  # don't spiderfy in Street View or GE Plugin!
-      @trigger('click', marker)
+      @trigger('click', marker, event)
     else
       nearbyMarkerData = []
       nonNearbyMarkers = []
@@ -154,7 +154,7 @@ class @['OverlappingMarkerSpiderfier']
         else
           nonNearbyMarkers.push(m)
       if nearbyMarkerData.length is 1  # 1 => the one clicked => none nearby
-        @trigger('click', marker)
+        @trigger('click', marker, event)
       else
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
   
