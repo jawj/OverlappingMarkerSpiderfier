@@ -1,6 +1,6 @@
 ###* @preserve OverlappingMarkerSpiderfier
 https://github.com/jawj/OverlappingMarkerSpiderfier
-Copyright (c) 2011 - 2012 George MacKerron
+Copyright (c) 2011 - 2013 George MacKerron
 Released under the MIT licence: http://opensource.org/licenses/mit-license
 Note: The Google Maps API v3 must be included *before* this code
 ###
