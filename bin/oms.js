@@ -17,11 +17,15 @@ Note: The Google Maps API v3 must be included *before* this code
   }
 
   this['OverlappingMarkerSpiderfier'] = (function() {
-    var ge, gm, lcH, lcU, mt, p, twoPi;
+    var ge, gm, lcH, lcU, mt, p, twoPi, x, _i, _len, _ref1;
 
     p = _Class.prototype;
 
-    p['VERSION'] = '0.3.2';
+    _ref1 = [_Class, p];
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      x = _ref1[_i];
+      x['VERSION'] = '0.3.3';
+    }
 
     gm = google.maps;
 
@@ -77,7 +81,7 @@ Note: The Google Maps API v3 must be included *before* this code
     lcH[mt.TERRAIN] = lcH[mt.ROADMAP] = '#f00';
 
     function _Class(map, opts) {
-      var e, k, v, _i, _len, _ref1,
+      var e, k, v, _j, _len1, _ref2,
         _this = this;
 
       this.map = map;
@@ -92,9 +96,9 @@ Note: The Google Maps API v3 must be included *before* this code
       this.projHelper = new this.constructor.ProjHelper(this.map);
       this.initMarkerArrays();
       this.listeners = {};
-      _ref1 = ['click', 'zoom_changed', 'maptypeid_changed'];
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        e = _ref1[_i];
+      _ref2 = ['click', 'zoom_changed', 'maptypeid_changed'];
+      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+        e = _ref2[_j];
         ge.addListener(this.map, e, function() {
           return _this['unspiderfy']();
         });
@@ -115,8 +119,8 @@ Note: The Google Maps API v3 must be included *before* this code
       }
       marker['_oms'] = true;
       listenerRefs = [
-        ge.addListener(marker, 'click', function() {
-          return _this.spiderListener(marker);
+        ge.addListener(marker, 'click', function(event) {
+          return _this.spiderListener(marker, event);
         })
       ];
       if (!this['markersWontHide']) {
@@ -145,7 +149,7 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p['removeMarker'] = function(marker) {
-      var i, listenerRef, listenerRefs, _i, _len;
+      var i, listenerRef, listenerRefs, _j, _len1;
 
       if (marker['_omsData'] != null) {
         this['unspiderfy']();
@@ -155,8 +159,8 @@ Note: The Google Maps API v3 must be included *before* this code
         return this;
       }
       listenerRefs = this.markerListenerRefs.splice(i, 1)[0];
-      for (_i = 0, _len = listenerRefs.length; _i < _len; _i++) {
-        listenerRef = listenerRefs[_i];
+      for (_j = 0, _len1 = listenerRefs.length; _j < _len1; _j++) {
+        listenerRef = listenerRefs[_j];
         ge.removeListener(listenerRef);
       }
       delete marker['_oms'];
@@ -165,15 +169,15 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p['clearMarkers'] = function() {
-      var i, listenerRef, listenerRefs, marker, _i, _j, _len, _len1, _ref1;
+      var i, listenerRef, listenerRefs, marker, _j, _k, _len1, _len2, _ref2;
 
       this['unspiderfy']();
-      _ref1 = this.markers;
-      for (i = _i = 0, _len = _ref1.length; _i < _len; i = ++_i) {
-        marker = _ref1[i];
+      _ref2 = this.markers;
+      for (i = _j = 0, _len1 = _ref2.length; _j < _len1; i = ++_j) {
+        marker = _ref2[i];
         listenerRefs = this.markerListenerRefs[i];
-        for (_j = 0, _len1 = listenerRefs.length; _j < _len1; _j++) {
-          listenerRef = listenerRefs[_j];
+        for (_k = 0, _len2 = listenerRefs.length; _k < _len2; _k++) {
+          listenerRef = listenerRefs[_k];
           ge.removeListener(listenerRef);
         }
         delete marker['_oms'];
@@ -183,9 +187,9 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p['addListener'] = function(event, func) {
-      var _base, _ref1;
+      var _base, _ref2;
 
-      ((_ref1 = (_base = this.listeners)[event]) != null ? _ref1 : _base[event] = []).push(func);
+      ((_ref2 = (_base = this.listeners)[event]) != null ? _ref2 : _base[event] = []).push(func);
       return this;
     };
 
@@ -205,26 +209,26 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p.trigger = function() {
-      var args, event, func, _i, _len, _ref1, _ref2, _results;
+      var args, event, func, _j, _len1, _ref2, _ref3, _results;
 
       event = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      _ref2 = (_ref1 = this.listeners[event]) != null ? _ref1 : [];
+      _ref3 = (_ref2 = this.listeners[event]) != null ? _ref2 : [];
       _results = [];
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        func = _ref2[_i];
+      for (_j = 0, _len1 = _ref3.length; _j < _len1; _j++) {
+        func = _ref3[_j];
         _results.push(func.apply(null, args));
       }
       return _results;
     };
 
     p.generatePtsCircle = function(count, centerPt) {
-      var angle, angleStep, circumference, i, legLength, _i, _results;
+      var angle, angleStep, circumference, i, legLength, _j, _results;
 
       circumference = this['circleFootSeparation'] * (2 + count);
       legLength = circumference / twoPi;
       angleStep = twoPi / count;
       _results = [];
-      for (i = _i = 0; 0 <= count ? _i < count : _i > count; i = 0 <= count ? ++_i : --_i) {
+      for (i = _j = 0; 0 <= count ? _j < count : _j > count; i = 0 <= count ? ++_j : --_j) {
         angle = this['circleStartAngle'] + i * angleStep;
         _results.push(new gm.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle)));
       }
@@ -232,12 +236,12 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p.generatePtsSpiral = function(count, centerPt) {
-      var angle, i, legLength, pt, _i, _results;
+      var angle, i, legLength, pt, _j, _results;
 
       legLength = this['spiralLengthStart'];
       angle = 0;
       _results = [];
-      for (i = _i = 0; 0 <= count ? _i < count : _i > count; i = 0 <= count ? ++_i : --_i) {
+      for (i = _j = 0; 0 <= count ? _j < count : _j > count; i = 0 <= count ? ++_j : --_j) {
         angle += this['spiralFootSeparation'] / legLength + i * 0.0005;
         pt = new gm.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle));
         legLength += twoPi * this['spiralLengthFactor'] / angle;
@@ -246,24 +250,24 @@ Note: The Google Maps API v3 must be included *before* this code
       return _results;
     };
 
-    p.spiderListener = function(marker) {
-      var m, mPt, markerPt, markerSpiderfied, nDist, nearbyMarkerData, nonNearbyMarkers, pxSq, _i, _len, _ref1;
+    p.spiderListener = function(marker, event) {
+      var m, mPt, markerPt, markerSpiderfied, nDist, nearbyMarkerData, nonNearbyMarkers, pxSq, _j, _len1, _ref2;
 
       markerSpiderfied = marker['_omsData'] != null;
       if (!(markerSpiderfied && this['keepSpiderfied'])) {
         this['unspiderfy']();
       }
       if (markerSpiderfied || this.map.getStreetView().getVisible() || this.map.getMapTypeId() === 'GoogleEarthAPI') {
-        return this.trigger('click', marker);
+        return this.trigger('click', marker, event);
       } else {
         nearbyMarkerData = [];
         nonNearbyMarkers = [];
         nDist = this['nearbyDistance'];
         pxSq = nDist * nDist;
         markerPt = this.llToPt(marker.position);
-        _ref1 = this.markers;
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-          m = _ref1[_i];
+        _ref2 = this.markers;
+        for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+          m = _ref2[_j];
           if (!((m.map != null) && m.getVisible())) {
             continue;
           }
@@ -278,7 +282,7 @@ Note: The Google Maps API v3 must be included *before* this code
           }
         }
         if (nearbyMarkerData.length === 1) {
-          return this.trigger('click', marker);
+          return this.trigger('click', marker, event);
         } else {
           return this.spiderfy(nearbyMarkerData, nonNearbyMarkers);
         }
@@ -286,7 +290,7 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p['markersNearMarker'] = function(marker, firstOnly) {
-      var m, mPt, markerPt, markers, nDist, pxSq, _i, _len, _ref1, _ref2, _ref3;
+      var m, mPt, markerPt, markers, nDist, pxSq, _j, _len1, _ref2, _ref3, _ref4;
 
       if (firstOnly == null) {
         firstOnly = false;
@@ -298,13 +302,13 @@ Note: The Google Maps API v3 must be included *before* this code
       pxSq = nDist * nDist;
       markerPt = this.llToPt(marker.position);
       markers = [];
-      _ref1 = this.markers;
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        m = _ref1[_i];
+      _ref2 = this.markers;
+      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+        m = _ref2[_j];
         if (m === marker || (m.map == null) || !m.getVisible()) {
           continue;
         }
-        mPt = this.llToPt((_ref2 = (_ref3 = m['_omsData']) != null ? _ref3.usualPosition : void 0) != null ? _ref2 : m.position);
+        mPt = this.llToPt((_ref3 = (_ref4 = m['_omsData']) != null ? _ref4.usualPosition : void 0) != null ? _ref3 : m.position);
         if (this.ptDistanceSq(mPt, markerPt) < pxSq) {
           markers.push(m);
           if (firstOnly) {
@@ -316,7 +320,7 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p['markersNearAnyOtherMarker'] = function() {
-      var i, i1, i2, m, m1, m1Data, m2, m2Data, mData, nDist, pxSq, _i, _j, _k, _len, _len1, _len2, _ref1, _ref2, _ref3, _results;
+      var i, i1, i2, m, m1, m1Data, m2, m2Data, mData, nDist, pxSq, _j, _k, _l, _len1, _len2, _len3, _ref2, _ref3, _ref4, _results;
 
       if (this.projHelper.getProjection() == null) {
         throw "Must wait for 'idle' event on map before calling markersNearAnyOtherMarker";
@@ -324,22 +328,22 @@ Note: The Google Maps API v3 must be included *before* this code
       nDist = this['nearbyDistance'];
       pxSq = nDist * nDist;
       mData = (function() {
-        var _i, _len, _ref1, _ref2, _ref3, _results;
+        var _j, _len1, _ref2, _ref3, _ref4, _results;
 
-        _ref1 = this.markers;
+        _ref2 = this.markers;
         _results = [];
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-          m = _ref1[_i];
+        for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+          m = _ref2[_j];
           _results.push({
-            pt: this.llToPt((_ref2 = (_ref3 = m['_omsData']) != null ? _ref3.usualPosition : void 0) != null ? _ref2 : m.position),
+            pt: this.llToPt((_ref3 = (_ref4 = m['_omsData']) != null ? _ref4.usualPosition : void 0) != null ? _ref3 : m.position),
             willSpiderfy: false
           });
         }
         return _results;
       }).call(this);
-      _ref1 = this.markers;
-      for (i1 = _i = 0, _len = _ref1.length; _i < _len; i1 = ++_i) {
-        m1 = _ref1[i1];
+      _ref2 = this.markers;
+      for (i1 = _j = 0, _len1 = _ref2.length; _j < _len1; i1 = ++_j) {
+        m1 = _ref2[i1];
         if (!((m1.map != null) && m1.getVisible())) {
           continue;
         }
@@ -347,9 +351,9 @@ Note: The Google Maps API v3 must be included *before* this code
         if (m1Data.willSpiderfy) {
           continue;
         }
-        _ref2 = this.markers;
-        for (i2 = _j = 0, _len1 = _ref2.length; _j < _len1; i2 = ++_j) {
-          m2 = _ref2[i2];
+        _ref3 = this.markers;
+        for (i2 = _k = 0, _len2 = _ref3.length; _k < _len2; i2 = ++_k) {
+          m2 = _ref3[i2];
           if (i2 === i1) {
             continue;
           }
@@ -366,10 +370,10 @@ Note: The Google Maps API v3 must be included *before* this code
           }
         }
       }
-      _ref3 = this.markers;
+      _ref4 = this.markers;
       _results = [];
-      for (i = _k = 0, _len2 = _ref3.length; _k < _len2; i = ++_k) {
-        m = _ref3[i];
+      for (i = _l = 0, _len3 = _ref4.length; _l < _len3; i = ++_l) {
+        m = _ref4[i];
         if (mData[i].willSpiderfy) {
           _results.push(m);
         }
@@ -402,23 +406,23 @@ Note: The Google Maps API v3 must be included *before* this code
       this.spiderfying = true;
       numFeet = markerData.length;
       bodyPt = this.ptAverage((function() {
-        var _i, _len, _results;
+        var _j, _len1, _results;
 
         _results = [];
-        for (_i = 0, _len = markerData.length; _i < _len; _i++) {
-          md = markerData[_i];
+        for (_j = 0, _len1 = markerData.length; _j < _len1; _j++) {
+          md = markerData[_j];
           _results.push(md.markerPt);
         }
         return _results;
       })());
       footPts = numFeet >= this['circleSpiralSwitchover'] ? this.generatePtsSpiral(numFeet, bodyPt).reverse() : this.generatePtsCircle(numFeet, bodyPt);
       spiderfiedMarkers = (function() {
-        var _i, _len, _results,
+        var _j, _len1, _results,
           _this = this;
 
         _results = [];
-        for (_i = 0, _len = footPts.length; _i < _len; _i++) {
-          footPt = footPts[_i];
+        for (_j = 0, _len1 = footPts.length; _j < _len1; _j++) {
+          footPt = footPts[_j];
           footLl = this.ptToLl(footPt);
           nearestMarkerDatum = this.minExtract(markerData, function(md) {
             return _this.ptDistanceSq(md.markerPt, footPt);
@@ -454,7 +458,7 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p['unspiderfy'] = function(markerNotToMove) {
-      var listeners, marker, nonNearbyMarkers, unspiderfiedMarkers, _i, _len, _ref1;
+      var listeners, marker, nonNearbyMarkers, unspiderfiedMarkers, _j, _len1, _ref2;
 
       if (markerNotToMove == null) {
         markerNotToMove = null;
@@ -465,9 +469,9 @@ Note: The Google Maps API v3 must be included *before* this code
       this.unspiderfying = true;
       unspiderfiedMarkers = [];
       nonNearbyMarkers = [];
-      _ref1 = this.markers;
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        marker = _ref1[_i];
+      _ref2 = this.markers;
+      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+        marker = _ref2[_j];
         if (marker['_omsData'] != null) {
           marker['_omsData'].leg.setMap(null);
           if (marker !== markerNotToMove) {
@@ -500,11 +504,11 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p.ptAverage = function(pts) {
-      var numPts, pt, sumX, sumY, _i, _len;
+      var numPts, pt, sumX, sumY, _j, _len1;
 
       sumX = sumY = 0;
-      for (_i = 0, _len = pts.length; _i < _len; _i++) {
-        pt = pts[_i];
+      for (_j = 0, _len1 = pts.length; _j < _len1; _j++) {
+        pt = pts[_j];
         sumX += pt.x;
         sumY += pt.y;
       }
@@ -521,9 +525,9 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p.minExtract = function(set, func) {
-      var bestIndex, bestVal, index, item, val, _i, _len;
+      var bestIndex, bestVal, index, item, val, _j, _len1;
 
-      for (index = _i = 0, _len = set.length; _i < _len; index = ++_i) {
+      for (index = _j = 0, _len1 = set.length; _j < _len1; index = ++_j) {
         item = set[index];
         val = func(item);
         if ((typeof bestIndex === "undefined" || bestIndex === null) || val < bestVal) {
@@ -535,12 +539,12 @@ Note: The Google Maps API v3 must be included *before* this code
     };
 
     p.arrIndexOf = function(arr, obj) {
-      var i, o, _i, _len;
+      var i, o, _j, _len1;
 
       if (arr.indexOf != null) {
         return arr.indexOf(obj);
       }
-      for (i = _i = 0, _len = arr.length; _i < _len; i = ++_i) {
+      for (i = _j = 0, _len1 = arr.length; _j < _len1; i = ++_j) {
         o = arr[i];
         if (o === obj) {
           return i;
