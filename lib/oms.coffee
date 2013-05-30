@@ -7,9 +7,10 @@ Note: The Google Maps API v3 must be included *before* this code
 
 # NB. string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
 
-return unless this['google']?['maps']?  # return from wrapper func without doing anything
+use_define = @define and @define.amd
+return unless use_define or this['google']?['maps']?  # return from wrapper func without doing anything
 
-class @['OverlappingMarkerSpiderfier']
+oms = (ctx) -> class ctx['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
   x['VERSION'] = '0.3.3' for x in [@, p]  # better on @, but defined on p too for backward-compat
   
@@ -293,3 +294,9 @@ class @['OverlappingMarkerSpiderfier']
   @ProjHelper = (map) -> @setMap(map)
   @ProjHelper:: = new gm.OverlayView()
   @ProjHelper::['draw'] = ->  # dummy function
+
+if use_define
+  define 'oms', ['google'], (google) ->
+    oms({ google: google })
+else
+  oms(@)
