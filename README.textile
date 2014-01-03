@@ -118,6 +118,10 @@ This is the lowest number of markers that will be fanned out into a spiral inste
 
 This determines the thickness of the lines joining spiderfied markers to their original locations. 
 
+*circleFootSeparation* (default: @23@)
+
+This is the radius of the circle when markers are spiderfied
+
 h3. Instance methods: managing markers
 
 Note: methods that have no obvious return value return the OverlappingMarkerSpiderfier instance they were called on, in case you want to chain method calls.
