@@ -1,17 +1,18 @@
 ###* @preserve OverlappingMarkerSpiderfier
 https://github.com/jawj/OverlappingMarkerSpiderfier
-Copyright (c) 2011 - 2013 George MacKerron
+Copyright (c) 2011 - 2014 George MacKerron
 Released under the MIT licence: http://opensource.org/licenses/mit-license
 Note: The Google Maps API v3 must be included *before* this code
 ###
 
 # NB. string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
 
-return unless this['google']?['maps']?  # return from wrapper func without doing anything
+unless @['google']?['maps']?
+  throw 'OverlappingMarkerSpiderfier must be loaded AFTER the Google Maps API v3'
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  x['VERSION'] = '0.3.3' for x in [@, p]  # better on @, but defined on p too for backward-compat
+  x['VERSION'] = '0.4' for x in [@, p]  # better on @, but defined on p too for backward-compat
   
   gm = google.maps
   ge = gm.event
@@ -140,6 +141,7 @@ class @['OverlappingMarkerSpiderfier']
     @['unspiderfy']() unless markerSpiderfied and @['keepSpiderfied']
     if markerSpiderfied or @map.getStreetView().getVisible() or @map.getMapTypeId() is 'GoogleEarthAPI'  # don't spiderfy in Street View or GE Plugin!
       @trigger('click', marker, event)
+      ge.trigger(marker, 'spiderclick', event)
     else
       nearbyMarkerData = []
       nonNearbyMarkers = []
@@ -155,6 +157,7 @@ class @['OverlappingMarkerSpiderfier']
           nonNearbyMarkers.push(m)
       if nearbyMarkerData.length is 1  # 1 => the one clicked => none nearby
         @trigger('click', marker, event)
+        ge.trigger(marker, 'spiderclick', event)
       else
         @spiderfy(nearbyMarkerData, nonNearbyMarkers)
   

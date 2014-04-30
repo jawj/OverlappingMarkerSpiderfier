@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PATH="/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin:$PATH"
+
 INDIR=../lib/
 INPREFIX=oms
 
@@ -13,7 +15,7 @@ java -jar /usr/local/closure-compiler/compiler.jar \
   --compilation_level ADVANCED_OPTIMIZATIONS \
   --js ${OUTDIR}${INPREFIX}.js \
   --externs google_maps_api_v3_7.js \
-  --output_wrapper '(function(){%output%}).call(this);' \
+  --output_wrapper ';(function(){%output%}).call(this);' \
 > $OUTFILE
 
 echo '/*' $(date) '*/' >> $OUTFILE
