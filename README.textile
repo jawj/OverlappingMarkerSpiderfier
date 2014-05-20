@@ -1,16 +1,3 @@
-h1. Getting started
-
-bc. npm install
-
-bc. npm install -g bower
-
-bc. bower install
-
-bc. npm install -g gulp
-
-bc. gulp
-
-
 h1. Overlapping Marker Spiderfier for Google Maps API v3
 
 *Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that overlap each other spring apart gracefully when you click them, so you can pick the one you meant?*
@@ -219,6 +206,14 @@ legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] =
   legColors.highlighted[mti.TERRAIN] = legColors.highlighted[mti.ROADMAP] = '#f00';
 
 You can also get and set any of the options noted in the constructor function documentation above as properties on an OverlappingMarkerSpiderfier instance. However, for some of these options (e.g. @markersWontMove@) modifications won't be applied retroactively.
+
+h1. How to build
+
+bc. npm install
+bc. npm install -g bower
+bc. bower install
+bc. npm install -g gulp
+bc. gulp
 
 h2. Licence
 

@@ -17,7 +17,7 @@
     "gmaps"
   ],
   "author": "George MacKerron",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jawj/OverlappingMarkerSpiderfier/issues"
   },

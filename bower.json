@@ -6,7 +6,7 @@
     "George MacKerron"
   ],
   "description": "Deals with overlapping markers in Google Maps JS API v3, Google Earth-style",
-  "license": "ICS",
+  "license": "MIT",
   "ignore": [
     "node_modules",
     "bower_components"
