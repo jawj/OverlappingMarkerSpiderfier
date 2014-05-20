@@ -3,7 +3,7 @@ var coffee = require('gulp-coffee');
 var gutil = require('gulp-util');
 var closureCompiler = require('gulp-closure-compiler');
 
-gulp.task('coffee', function() {
+gulp.task('default', function() {
   gulp.src('./lib/*.coffee')
     .pipe(coffee({bare: true}).on('error', gutil.log))
     .pipe(gulp.dest('.'))
