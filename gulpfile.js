@@ -15,8 +15,8 @@ gulp.task('default', function() {
         externs: [
           'bower_components/google-maps-externs/google_maps_api.js'
         ],
-        output_wrapper: '(function(){%output%})();'
-        //warning_level: 'VERBOSE'
+        output_wrapper: '(function(){%output%})();',
+        warning_level: 'QUIET'
       }
     }))
     .pipe(gulp.dest('.'))
