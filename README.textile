@@ -210,10 +210,10 @@ You can also get and set any of the options noted in the constructor function do
 h1. How to build
 
 bc. npm install
-bc. npm install -g bower
-bc. bower install
-bc. npm install -g gulp
-bc. gulp
+npm install -g bower
+bower install
+npm install -g gulp
+gulp
 
 h2. Licence
 
