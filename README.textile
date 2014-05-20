@@ -1,14 +1,14 @@
 h1. Getting started
 
-bc.npm install
+bc. npm install
 
-bc.npm install -g bower
+bc. npm install -g bower
 
-bc.bower install
+bc. bower install
 
-bc.npm install -g gulp
+bc. npm install -g gulp
 
-bc.gulp
+bc. gulp
 
 
 h1. Overlapping Marker Spiderfier for Google Maps API v3
