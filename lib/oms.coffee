@@ -140,8 +140,9 @@ class @['OverlappingMarkerSpiderfier']
     markerSpiderfied = marker['_omsData']?
     unless markerSpiderfied and @['keepSpiderfied']
       if this['event'] is 'mouseover'
+        $this = @
+        clear = () -> $this['unspiderfy']()
         window.clearTimeout(p.timeout)
-        clear = @['unspiderfy']()
         p.timeout = setTimeout clear, 3000
       else
         @['unspiderfy']()
