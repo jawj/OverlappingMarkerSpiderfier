@@ -138,7 +138,13 @@ class @['OverlappingMarkerSpiderfier']
   
   p.spiderListener = (marker, event) ->
     markerSpiderfied = marker['_omsData']?
-    @['unspiderfy']() unless markerSpiderfied and @['keepSpiderfied']
+    unless markerSpiderfied and @['keepSpiderfied']
+      if this['event'] is 'mouseover'
+        window.clearTimeout(p.timeout)
+        clear = @['unspiderfy']()
+        p.timeout = setTimeout clear, 3000
+      else
+        @['unspiderfy']()
     if markerSpiderfied or @map.getStreetView().getVisible() or @map.getMapTypeId() is 'GoogleEarthAPI'  # don't spiderfy in Street View or GE Plugin!
       @trigger('click', marker, event)
     else
