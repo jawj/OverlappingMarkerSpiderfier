@@ -35,6 +35,7 @@ class @['OverlappingMarkerSpiderfier']
   p['spiderfiedZIndex'] = 1000       # ensure spiderfied markers are on top
   p['usualLegZIndex'] = 10           # for legs
   p['highlightedLegZIndex'] = 20     # ensure highlighted leg is always on top
+  p['event'] = 'click'               # Event to use when we want to spiderify
   
   p['legWeight'] = 1.5
   p['legColors'] =
@@ -65,7 +66,7 @@ class @['OverlappingMarkerSpiderfier']
   p['addMarker'] = (marker) ->
     return @ if marker['_oms']?
     marker['_oms'] = yes
-    listenerRefs = [ge.addListener(marker, 'click', (event) => @spiderListener(marker, event))]
+    listenerRefs = [ge.addListener(marker, p['event'], (event) => @spiderListener(marker, event))]
     unless @['markersWontHide']
       listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
     unless @['markersWontMove']
