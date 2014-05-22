@@ -35,7 +35,8 @@ class @['OverlappingMarkerSpiderfier']
   p['spiderfiedZIndex'] = 1000       # ensure spiderfied markers are on top
   p['usualLegZIndex'] = 10           # for legs
   p['highlightedLegZIndex'] = 20     # ensure highlighted leg is always on top
-  p['event'] = 'click'               # Event to use when we want to spiderify
+  p['event'] = 'click'               # Event to use when we want to trigger spiderify
+  p['minZoomLevel'] = no             # Minimum zoom level necessary to trigger spiderify
   
   p['legWeight'] = 1.5
   p['legColors'] =
@@ -213,6 +214,9 @@ class @['OverlappingMarkerSpiderfier']
         zIndex: @['usualLegZIndex']
   
   p.spiderfy = (markerData, nonNearbyMarkers) ->
+    if @['minZoomLevel'] and @map.getZoom() < @['minZoomLevel']
+      return no
+
     @spiderfying = yes
     numFeet = markerData.length
     bodyPt = @ptAverage(md.markerPt for md in markerData)
