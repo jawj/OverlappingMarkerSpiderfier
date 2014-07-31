@@ -224,6 +224,7 @@ class @['OverlappingMarkerSpiderfier']
         zIndex: @['usualLegZIndex']
       marker['_omsData'] = 
         usualPosition: marker.position
+        usualzIndex: marker.zIndex
         leg: leg
       unless @['legColors']['highlighted'][@map.mapTypeId] is
              @['legColors']['usual'][@map.mapTypeId]
@@ -247,7 +248,7 @@ class @['OverlappingMarkerSpiderfier']
       if marker['_omsData']?
         marker['_omsData'].leg.setMap(null)
         marker.setPosition(marker['_omsData'].usualPosition) unless marker is markerNotToMove
-        marker.setZIndex(null)
+        marker.setZIndex(marker['_omsData'].usualzIndex)
         listeners = marker['_omsData'].hightlightListeners
         if listeners?
           ge.removeListener(listeners.highlight)
