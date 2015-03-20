@@ -14,7 +14,7 @@ java -jar "%JARPATH%" ^
   --compilation_level ADVANCED_OPTIMIZATIONS ^
   --js "%OUTDIR%%INPREFIX%.js" ^
   --externs google_maps_api_v3_7.js ^
-  --output_wrapper '(function(){%%output%%}).call(this);' ^
+  --output_wrapper ';(function(){%%output%%}).call(this);' ^
   > "%OUTFILE%"
 
 echo /* %date% %time% */ >> "%OUTFILE%"
