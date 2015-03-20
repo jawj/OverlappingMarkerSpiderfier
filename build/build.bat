@@ -7,14 +7,13 @@ set OUTFILE=%OUTDIR%%OUTNAME%
 
 call coffee --output %OUTDIR% --compile %INDIR%%INPREFIX%.coffee
 
-set theValue=
-for /f "delims=" %%a in ('cygpath -m /usr/local/closure-compiler/compiler.jar') do @set JARPATH=%%a
+@set JARPATH=c:\Dev\closure-compiler\compiler.jar
 
 java -jar "%JARPATH%" ^
   --compilation_level ADVANCED_OPTIMIZATIONS ^
   --js "%OUTDIR%%INPREFIX%.js" ^
   --externs google_maps_api_v3_7.js ^
-  --output_wrapper ';(function(){%%output%%}).call(this);' ^
+  --output_wrapper ;(function(){%%output%%}).call(this); ^
   > "%OUTFILE%"
 
 echo /* %date% %time% */ >> "%OUTFILE%"
