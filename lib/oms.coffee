@@ -145,10 +145,10 @@ class @['OverlappingMarkerSpiderfier']
       nonNearbyMarkers = []
       nDist = @['nearbyDistance']
       pxSq = nDist * nDist
-      markerPt = @llToPt(marker.getPosition())
+      markerPt = @llToPt(marker.position)
       for m in @markers
         continue unless m.map? and m.getVisible()  # at 2011-08-12, property m.visible is undefined in API v3.5
-        mPt = @llToPt(m.getPosition())
+        mPt = @llToPt(m.position)
         if @ptDistanceSq(mPt, markerPt) < pxSq
           nearbyMarkerData.push(marker: m, markerPt: mPt)
         else
@@ -163,11 +163,11 @@ class @['OverlappingMarkerSpiderfier']
       throw "Must wait for 'idle' event on map before calling markersNearMarker"
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
-    markerPt = @llToPt(marker.getPosition())
+    markerPt = @llToPt(marker.position)
     markers = []
     for m in @markers
       continue if m is marker or not m.map? or not m.getVisible()
-      mPt = @llToPt(m['_omsData']?.usualPosition ? m.getPosition())
+      mPt = @llToPt(m['_omsData']?.usualPosition ? m.position)
       if @ptDistanceSq(mPt, markerPt) < pxSq
         markers.push(m)
         break if firstOnly
@@ -179,7 +179,7 @@ class @['OverlappingMarkerSpiderfier']
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
     mData = for m in @markers
-      {pt: @llToPt(m['_omsData']?.usualPosition ? m.getPosition()), willSpiderfy: no}
+      {pt: @llToPt(m['_omsData']?.usualPosition ? m.position), willSpiderfy: no}
     for m1, i1 in @markers
       continue unless m1.map? and m1.getVisible()
       m1Data = mData[i1]
@@ -218,12 +218,12 @@ class @['OverlappingMarkerSpiderfier']
       marker = nearestMarkerDatum.marker
       leg = new gm.Polyline
         map: @map
-        path: [marker.getPosition(), footLl]
+        path: [marker.position, footLl]
         strokeColor: @['legColors']['usual'][@map.mapTypeId]
         strokeWeight: @['legWeight']
         zIndex: @['usualLegZIndex']
       marker['_omsData'] = 
-        usualPosition: marker.getPosition()
+        usualPosition: marker.position
         leg: leg
       unless @['legColors']['highlighted'][@map.mapTypeId] is
              @['legColors']['usual'][@map.mapTypeId]
