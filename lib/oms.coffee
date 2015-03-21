@@ -69,7 +69,7 @@ class @['OverlappingMarkerSpiderfier']
     unless @['markersWontHide']
       listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
     unless @['markersWontMove']
-      listenerRefs.push(ge.addListener(marker, 'position_changed', => @markerChangeListener(marker, yes)))
+      listenerRefs.push(ge.addListener(marker, 'ghostposition_changed', => @markerChangeListener(marker, yes)))
     @markerListenerRefs.push(listenerRefs)
     @markers.push(marker)
     @  # return self, for chaining
@@ -145,10 +145,10 @@ class @['OverlappingMarkerSpiderfier']
       nonNearbyMarkers = []
       nDist = @['nearbyDistance']
       pxSq = nDist * nDist
-      markerPt = @llToPt(marker.position)
+      markerPt = @llToPt(marker.ghostPosition)
       for m in @markers
         continue unless m.map? and m.getVisible()  # at 2011-08-12, property m.visible is undefined in API v3.5
-        mPt = @llToPt(m.position)
+        mPt = @llToPt(m.ghostPosition)
         if @ptDistanceSq(mPt, markerPt) < pxSq
           nearbyMarkerData.push(marker: m, markerPt: mPt)
         else
@@ -163,11 +163,11 @@ class @['OverlappingMarkerSpiderfier']
       throw "Must wait for 'idle' event on map before calling markersNearMarker"
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
-    markerPt = @llToPt(marker.position)
+    markerPt = @llToPt(marker.ghostPosition)
     markers = []
     for m in @markers
       continue if m is marker or not m.map? or not m.getVisible()
-      mPt = @llToPt(m['_omsData']?.usualPosition ? m.position)
+      mPt = @llToPt(m['_omsData']?.usualPosition ? m.ghostPosition)
       if @ptDistanceSq(mPt, markerPt) < pxSq
         markers.push(m)
         break if firstOnly
@@ -179,7 +179,7 @@ class @['OverlappingMarkerSpiderfier']
     nDist = @['nearbyDistance']
     pxSq = nDist * nDist
     mData = for m in @markers
-      {pt: @llToPt(m['_omsData']?.usualPosition ? m.position), willSpiderfy: no}
+      {pt: @llToPt(m['_omsData']?.usualPosition ? m.ghostPosition), willSpiderfy: no}
     for m1, i1 in @markers
       continue unless m1.map? and m1.getVisible()
       m1Data = mData[i1]
@@ -218,12 +218,12 @@ class @['OverlappingMarkerSpiderfier']
       marker = nearestMarkerDatum.marker
       leg = new gm.Polyline
         map: @map
-        path: [marker.position, footLl]
+        path: [marker.ghostPosition, footLl]
         strokeColor: @['legColors']['usual'][@map.mapTypeId]
         strokeWeight: @['legWeight']
         zIndex: @['usualLegZIndex']
       marker['_omsData'] = 
-        usualPosition: marker.position
+        usualPosition: marker.ghostPosition
         leg: leg
       unless @['legColors']['highlighted'][@map.mapTypeId] is
              @['legColors']['usual'][@map.mapTypeId]
@@ -231,7 +231,7 @@ class @['OverlappingMarkerSpiderfier']
         marker['_omsData'].hightlightListeners =
           highlight:   ge.addListener(marker, 'mouseover', highlightListenerFuncs.highlight)
           unhighlight: ge.addListener(marker, 'mouseout',  highlightListenerFuncs.unhighlight)
-      marker.setPosition(footLl)
+      marker.setGhostPosition(footLl)
       marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # lower markers cover higher
       marker
     delete @spiderfying
@@ -246,7 +246,7 @@ class @['OverlappingMarkerSpiderfier']
     for marker in @markers
       if marker['_omsData']?
         marker['_omsData'].leg.setMap(null)
-        marker.setPosition(marker['_omsData'].usualPosition) unless marker is markerNotToMove
+        marker.setGhostPosition(marker['_omsData'].usualPosition) unless marker is markerNotToMove
         marker.setZIndex(null)
         listeners = marker['_omsData'].hightlightListeners
         if listeners?
