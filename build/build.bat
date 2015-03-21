@@ -12,7 +12,7 @@ call coffee --output %OUTDIR% --compile %INDIR%%INPREFIX%.coffee
 java -jar "%JARPATH%" ^
   --compilation_level ADVANCED_OPTIMIZATIONS ^
   --js "%OUTDIR%%INPREFIX%.js" ^
-  --externs google_maps_api_v3_7.js ^
+  --externs google_maps_api_v3_19.js SlidingMarker.annotations.js MarkerWithGhost.annotations.js ^
   --output_wrapper ;(function(){%%output%%}).call(this); ^
   > "%OUTFILE%"
 
