@@ -15,7 +15,7 @@
  */
 
 /**
- * @fileoverview Externs for the Google Maps v3.19 API.
+ * @fileoverview Externs for the Google Maps v3.20 API.
  * @see http://code.google.com/apis/maps/documentation/javascript/reference.html
  * @externs
  */
@@ -285,6 +285,24 @@ google.maps.Data.prototype.contains = function(feature) {};
 google.maps.Data.prototype.forEach = function(callback) {};
 
 /**
+ * @nosideeffects
+ * @return {google.maps.ControlPosition}
+ */
+google.maps.Data.prototype.getControlPosition = function() {};
+
+/**
+ * @nosideeffects
+ * @return {Array<string>}
+ */
+google.maps.Data.prototype.getControls = function() {};
+
+/**
+ * @nosideeffects
+ * @return {?string}
+ */
+google.maps.Data.prototype.getDrawingMode = function() {};
+
+/**
  * @param {number|string} id
  * @return {google.maps.Data.Feature|undefined}
  */
@@ -330,6 +348,24 @@ google.maps.Data.prototype.remove = function(feature) {};
 google.maps.Data.prototype.revertStyle = function(opt_feature) {};
 
 /**
+ * @param {google.maps.ControlPosition} controlPosition
+ * @return {undefined}
+ */
+google.maps.Data.prototype.setControlPosition = function(controlPosition) {};
+
+/**
+ * @param {Array<string>} controls
+ * @return {undefined}
+ */
+google.maps.Data.prototype.setControls = function(controls) {};
+
+/**
+ * @param {?string} drawingMode
+ * @return {undefined}
+ */
+google.maps.Data.prototype.setDrawingMode = function(drawingMode) {};
+
+/**
  * @param {google.maps.Map} map
  * @return {undefined}
  */
@@ -361,6 +397,26 @@ google.maps.Data.AddFeatureEvent.prototype.feature;
  * @interface
  */
 google.maps.Data.DataOptions = function() {};
+
+/**
+ * @type {google.maps.ControlPosition}
+ */
+google.maps.Data.DataOptions.prototype.controlPosition;
+
+/**
+ * @type {Array<string>}
+ */
+google.maps.Data.DataOptions.prototype.controls;
+
+/**
+ * @type {string}
+ */
+google.maps.Data.DataOptions.prototype.drawingMode;
+
+/**
+ * @type {function(google.maps.Data.Geometry): google.maps.Data.Feature}
+ */
+google.maps.Data.DataOptions.prototype.featureFactory;
 
 /**
  * @type {google.maps.Map}
@@ -812,6 +868,16 @@ google.maps.Data.StyleOptions.prototype.clickable;
  * @type {string}
  */
 google.maps.Data.StyleOptions.prototype.cursor;
+
+/**
+ * @type {boolean}
+ */
+google.maps.Data.StyleOptions.prototype.draggable;
+
+/**
+ * @type {boolean}
+ */
+google.maps.Data.StyleOptions.prototype.editable;
 
 /**
  * @type {string}
@@ -2109,6 +2175,11 @@ google.maps.ImageMapTypeOptions = function() {};
 google.maps.ImageMapTypeOptions.prototype.alt;
 
 /**
+ * @type {function(google.maps.Point, number): string}
+ */
+google.maps.ImageMapTypeOptions.prototype.getTileUrl;
+
+/**
  * @type {number}
  */
 google.maps.ImageMapTypeOptions.prototype.maxZoom;
@@ -2132,13 +2203,6 @@ google.maps.ImageMapTypeOptions.prototype.opacity;
  * @type {google.maps.Size}
  */
 google.maps.ImageMapTypeOptions.prototype.tileSize;
-
-/**
- * @param {google.maps.Point} coordinate
- * @param {number} zoom
- * @return {string}
- */
-google.maps.ImageMapTypeOptions.prototype.getTileUrl = function(coordinate, zoom) {};
 
 /**
  * @param {(google.maps.InfoWindowOptions|Object.<string>)=} opt_opts
@@ -4636,6 +4700,11 @@ google.maps.StreetViewPanoramaOptions.prototype.panControlOptions;
 google.maps.StreetViewPanoramaOptions.prototype.pano;
 
 /**
+ * @type {function(string): google.maps.StreetViewPanoramaData}
+ */
+google.maps.StreetViewPanoramaOptions.prototype.panoProvider;
+
+/**
  * @type {google.maps.LatLng|google.maps.LatLngLiteral}
  */
 google.maps.StreetViewPanoramaOptions.prototype.position;
@@ -4664,12 +4733,6 @@ google.maps.StreetViewPanoramaOptions.prototype.zoomControl;
  * @type {google.maps.ZoomControlOptions|Object.<string>}
  */
 google.maps.StreetViewPanoramaOptions.prototype.zoomControlOptions;
-
-/**
- * @param {string} panoId
- * @return {google.maps.StreetViewPanoramaData}
- */
-google.maps.StreetViewPanoramaOptions.prototype.panoProvider = function(panoId) {};
 
 /**
  * @constructor
@@ -5541,7 +5604,7 @@ google.maps.event = {};
 /**
  * @param {Object} instance
  * @param {string} eventName
- * @param {!Function} handler
+ * @param {function(?)|null} handler
  * @param {boolean=} opt_capture
  * @return {google.maps.MapsEventListener}
  */
@@ -5550,7 +5613,7 @@ google.maps.event.addDomListener = function(instance, eventName, handler, opt_ca
 /**
  * @param {Object} instance
  * @param {string} eventName
- * @param {!Function} handler
+ * @param {function(?)} handler
  * @param {boolean=} opt_capture
  * @return {google.maps.MapsEventListener}
  */
@@ -5559,7 +5622,7 @@ google.maps.event.addDomListenerOnce = function(instance, eventName, handler, op
 /**
  * @param {Object} instance
  * @param {string} eventName
- * @param {!Function} handler
+ * @param {function(?)|null} handler
  * @return {google.maps.MapsEventListener}
  */
 google.maps.event.addListener = function(instance, eventName, handler) {};
@@ -5567,7 +5630,7 @@ google.maps.event.addListener = function(instance, eventName, handler) {};
 /**
  * @param {Object} instance
  * @param {string} eventName
- * @param {!Function} handler
+ * @param {function(?)|null} handler
  * @return {google.maps.MapsEventListener}
  */
 google.maps.event.addListenerOnce = function(instance, eventName, handler) {};
@@ -6308,7 +6371,8 @@ google.maps.places.PlacesService.prototype.radarSearch = function(request, callb
 
 /**
  * @param {google.maps.places.TextSearchRequest|Object.<string>} request
- * @param {function(Array<google.maps.places.PlaceResult>, google.maps.places.PlacesServiceStatus)} callback
+ * @param {function(Array<google.maps.places.PlaceResult>, google.maps.places.PlacesServiceStatus,
+   google.maps.places.PlaceSearchPagination)} callback
  * @return {undefined}
  */
 google.maps.places.PlacesService.prototype.textSearch = function(request, callback) {};
@@ -6775,6 +6839,12 @@ google.maps.visualization.HeatmapLayer.prototype.setData = function(data) {};
  * @return {undefined}
  */
 google.maps.visualization.HeatmapLayer.prototype.setMap = function(map) {};
+
+/**
+ * @param {google.maps.visualization.HeatmapLayerOptions|Object.<string>} options
+ * @return {undefined}
+ */
+google.maps.visualization.HeatmapLayer.prototype.setOptions = function(options) {};
 
 /**
  * @interface
