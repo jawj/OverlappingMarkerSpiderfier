@@ -45,8 +45,7 @@ class @['OverlappingMarkerSpiderfier']
   # Note: it's OK that this constructor comes after the properties, because a function defined by a
   # function declaration can be used before the function declaration itself
   constructor: (@map, opts = {}) ->
-    if not gm
-      @initGoogleMapsDependentVars()
+    @initGoogleMapsDependentVars()
 
     (@[k] = v) for own k, v of opts
     @initMarkerArrays()
