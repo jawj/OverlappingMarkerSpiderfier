@@ -207,6 +207,14 @@ legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] =
 
 You can also get and set any of the options noted in the constructor function documentation above as properties on an OverlappingMarkerSpiderfier instance. However, for some of these options (e.g. @markersWontMove@) modifications won't be applied retroactively.
 
+h1. How to build
+
+bc. npm install
+npm install -g bower
+bower install
+npm install -g gulp
+gulp
+
 h2. Licence
 
 This software is released under the "MIT licence":http://www.opensource.org/licenses/mit-license.php.

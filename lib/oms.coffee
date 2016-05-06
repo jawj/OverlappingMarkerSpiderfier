@@ -7,7 +7,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
 # NB. string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
 
-return unless this['google']?['maps']?  # return from wrapper func without doing anything
+#return unless this['google']?['maps']?  # return from wrapper func without doing anything
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
@@ -35,6 +35,8 @@ class @['OverlappingMarkerSpiderfier']
   p['spiderfiedZIndex'] = 1000       # ensure spiderfied markers are on top
   p['usualLegZIndex'] = 10           # for legs
   p['highlightedLegZIndex'] = 20     # ensure highlighted leg is always on top
+  p['event'] = 'click'               # Event to use when we want to trigger spiderify
+  p['minZoomLevel'] = no             # Minimum zoom level necessary to trigger spiderify
   
   p['legWeight'] = 1.5
   p['legColors'] =
@@ -65,7 +67,7 @@ class @['OverlappingMarkerSpiderfier']
   p['addMarker'] = (marker) ->
     return @ if marker['_oms']?
     marker['_oms'] = yes
-    listenerRefs = [ge.addListener(marker, 'click', (event) => @spiderListener(marker, event))]
+    listenerRefs = [ge.addListener(marker, @['event'], (event) => @spiderListener(marker, event))]
     unless @['markersWontHide']
       listenerRefs.push(ge.addListener(marker, 'visible_changed', => @markerChangeListener(marker, no)))
     unless @['markersWontMove']
@@ -137,7 +139,14 @@ class @['OverlappingMarkerSpiderfier']
   
   p.spiderListener = (marker, event) ->
     markerSpiderfied = marker['_omsData']?
-    @['unspiderfy']() unless markerSpiderfied and @['keepSpiderfied']
+    unless markerSpiderfied and @['keepSpiderfied']
+      if this['event'] is 'mouseover'
+        $this = @
+        clear = () -> $this['unspiderfy']()
+        window.clearTimeout(p.timeout)
+        p.timeout = setTimeout clear, 3000
+      else
+        @['unspiderfy']()
     if markerSpiderfied or @map.getStreetView().getVisible() or @map.getMapTypeId() is 'GoogleEarthAPI'  # don't spiderfy in Street View or GE Plugin!
       @trigger('click', marker, event)
     else
@@ -205,6 +214,9 @@ class @['OverlappingMarkerSpiderfier']
         zIndex: @['usualLegZIndex']
   
   p.spiderfy = (markerData, nonNearbyMarkers) ->
+    if @['minZoomLevel'] and @map.getZoom() < @['minZoomLevel']
+      return no
+
     @spiderfying = yes
     numFeet = markerData.length
     bodyPt = @ptAverage(md.markerPt for md in markerData)
