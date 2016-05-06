@@ -22,7 +22,7 @@ That might be what you want. However, it probably *isn't* what you want (or isn'
 
 h2. Demo
 
-See the "demo map":http://jawj.github.com/OverlappingMarkerSpiderfier/demo.html (the data is random: reload the map to reposition the markers).
+See the "demo map":https://jawj.github.io/OverlappingMarkerSpiderfier/demo.html (the data is random: reload the map to reposition the markers).
 
 h2. Download
 
