@@ -1,18 +1,26 @@
 ###* @preserve OverlappingMarkerSpiderfier
 https://github.com/jawj/OverlappingMarkerSpiderfier
-Copyright (c) 2011 - 2013 George MacKerron
+Copyright (c) 2011 - 2017 George MacKerron
 Released under the MIT licence: http://opensource.org/licenses/mit-license
 Note: The Google Maps API v3 must be included *before* this code
 ###
 
 # NB. string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
 
-return unless this['google']?['maps']?  # return from wrapper func without doing anything
+unless this['google']?['maps']?  
+  throw 'Google Maps must be loaded already!'
+# return from wrapper func without doing anything
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  x['VERSION'] = '0.3.3' for x in [@, p]  # better on @, but defined on p too for backward-compat
+  x['VERSION'] = '0.4' for x in [@, p]  # better on @, but defined on p too for backward-compat
   
+  @['markerStatus'] = 
+    'SPIDERFIED':     'SPIDERFIED'
+    'SPIDERFIABLE':   'SPIDERFIABLE'
+    'UNSPIDERFIABLE': 'UNSPIDERFIABLE'
+    'REMOVED':        'REMOVED'
+
   gm = google.maps
   ge = gm.event
   mt = gm.MapTypeId
@@ -32,9 +40,9 @@ class @['OverlappingMarkerSpiderfier']
   p['spiralLengthStart'] = 11        # ditto
   p['spiralLengthFactor'] = 4        # ditto
   
-  p['spiderfiedZIndex'] = 1000       # ensure spiderfied markers are on top
-  p['usualLegZIndex'] = 10           # for legs
-  p['highlightedLegZIndex'] = 20     # ensure highlighted leg is always on top
+  p['spiderfiedZIndex']     = gm.Marker.MAX_ZINDEX + 10e7  # ensure spiderfied markers are on top
+  p['highlightedLegZIndex'] = gm.Marker.MAX_ZINDEX + 10e4  # ensure highlighted leg is always on top
+  p['usualLegZIndex']       = gm.Marker.MAX_ZINDEX + 10e1  # for legs
   
   p['legWeight'] = 1.5
   p['legColors'] =
@@ -55,9 +63,45 @@ class @['OverlappingMarkerSpiderfier']
     @projHelper = new @constructor.ProjHelper(@map)
     @initMarkerArrays()
     @listeners = {}
-    for e in ['click', 'zoom_changed', 'maptypeid_changed']
-      ge.addListener(@map, e, => @['unspiderfy']())
-    
+    @formatIdleListener = @formatTimeoutId = null
+
+    ge.addListener @map, 'click', => @['unspiderfy']()
+    ge.addListener @map, 'maptypeid_changed', => @['unspiderfy']()
+    ge.addListener @map, 'zoom_changed', =>
+      @['unspiderfy']()
+      @formatMarkers()
+
+  # formatMarkerWithStatus will be called:
+  # * on spiderfy, for all markers that spiderfy (status: SPIDERFIED)
+  # * on unspiderfy, for all markers that unspiderfy (status: SPIDERFIABLE)
+  # * on map zoom and on marker add, remove, position_changed, visible_changed, for all markers (status: SPIDERFIABLE | UNSPIDERFIABLE | REMOVED, as calculated)
+
+  p.setImmediate = (func) -> window.setTimeout func, 0
+
+  p.formatMarkers = -> 
+    if not @['formatMarkerWithStatus']? then return
+    if @formatTimeoutId? then return  # only format markers once per run loop (in case e.g. being called repeatedly from addMarker)
+    @formatTimeoutId = @setImmediate =>
+      @formatTimeoutId = null
+      if @projHelper.getProjection()?
+        @_formatMarkers()
+      else
+        if @formatIdleListener? then return  # if the map is not yet ready, and we're not already waiting, wait until it is ready
+        @formatIdleListener = ge.addListener @map, 'idle', =>
+          @formatIdleListener.remove()
+          @formatIdleListener = null
+          @_formatMarkers()
+
+  p._formatMarkers = ->  # only formatMarkers is allowed to call this directly 
+    proximities = @markerProximityData()  # {pt, willSpiderfy}[]
+    for marker, i in @markers
+      proximity = proximities[i]
+      status = if proximity.willSpiderfy
+        if marker['_omsData'] then 'SPIDERFIED' else 'SPIDERFIABLE'
+      else 
+        'UNSPIDERFIABLE'
+      @['formatMarkerWithStatus'] marker, @constructor['markerStatus'][status]
+
   p.initMarkerArrays = ->
     @markers = []
     @markerListenerRefs = []
@@ -72,11 +116,17 @@ class @['OverlappingMarkerSpiderfier']
       listenerRefs.push(ge.addListener(marker, 'position_changed', => @markerChangeListener(marker, yes)))
     @markerListenerRefs.push(listenerRefs)
     @markers.push(marker)
+
+    @formatMarkers()
+    
     @  # return self, for chaining
 
   p.markerChangeListener = (marker, positionChanged) ->
     if marker['_omsData']? and (positionChanged or not marker.getVisible()) and not (@spiderfying? or @unspiderfying?)
       @['unspiderfy'](if positionChanged then marker else null)
+
+    if not (@spiderfying? or @unspiderfying?)
+      @formatMarkers()
       
   p['getMarkers'] = -> @markers[0..]  # returns a copy, so no funny business
 
@@ -88,6 +138,10 @@ class @['OverlappingMarkerSpiderfier']
     ge.removeListener(listenerRef) for listenerRef in listenerRefs
     delete marker['_oms']
     @markers.splice(i, 1)
+    
+    @['formatMarkerWithStatus']?(marker, @constructor['markerStatus']['REMOVED'])
+    @formatMarkers()
+    
     @  # return self, for chaining
     
   p['clearMarkers'] = ->
@@ -96,6 +150,8 @@ class @['OverlappingMarkerSpiderfier']
       listenerRefs = @markerListenerRefs[i]
       ge.removeListener(listenerRef) for listenerRef in listenerRefs
       delete marker['_oms']
+      @['formatMarkerWithStatus']?(marker, @constructor['markerStatus']['REMOVED'])
+
     @initMarkerArrays()
     @  # return self, for chaining
         
@@ -173,7 +229,7 @@ class @['OverlappingMarkerSpiderfier']
         break if firstOnly
     markers
   
-  p['markersNearAnyOtherMarker'] = ->  # *very* much quicker than calling markersNearMarker in a loop
+  p.markerProximityData = ->
     unless @projHelper.getProjection()?
       throw "Must wait for 'idle' event on map before calling markersNearAnyOtherMarker"
     nDist = @['nearbyDistance']
@@ -181,17 +237,22 @@ class @['OverlappingMarkerSpiderfier']
     mData = for m in @markers
       {pt: @llToPt(m['_omsData']?.usualPosition ? m.position), willSpiderfy: no}
     for m1, i1 in @markers
-      continue unless m1.map? and m1.getVisible()
+      continue unless m1.map? and m1.getVisible()  # marker not visible: ignore
       m1Data = mData[i1]
-      continue if m1Data.willSpiderfy
+      continue if m1Data.willSpiderfy  # true in the case that we've assessed an earlier marker that was near this one
       for m2, i2 in @markers
-        continue if i2 is i1
-        continue unless m2.map? and m2.getVisible()
+        continue if i2 is i1  # markers cannot be near themselves: ignore
+        continue unless m2.map? and m2.getVisible()  # marker not visible: ignore
         m2Data = mData[i2]
-        continue if i2 < i1 and not m2Data.willSpiderfy
+        continue if i2 < i1 and not m2Data.willSpiderfy  # if i2 < i1, m2 has already been checked for proximity to any other marker; 
+                                                         # so if willSpiderfy is false, it cannot be near any other marker, including this one (m1)
         if @ptDistanceSq(m1Data.pt, m2Data.pt) < pxSq
           m1Data.willSpiderfy = m2Data.willSpiderfy = yes
           break
+    mData
+
+  p['markersNearAnyOtherMarker'] = ->  # *very* much quicker than calling markersNearMarker in a loop
+    mData = @markerProximityData
     m for m, i in @markers when mData[i].willSpiderfy
   
   p.makeHighlightListenerFuncs = (marker) ->
@@ -233,6 +294,7 @@ class @['OverlappingMarkerSpiderfier']
           unhighlight: ge.addListener(marker, 'mouseout',  highlightListenerFuncs.unhighlight)
       marker.setPosition(footLl)
       marker.setZIndex(Math.round(@['spiderfiedZIndex'] + footPt.y))  # lower markers cover higher
+      @['formatMarkerWithStatus']?(marker, @constructor['markerStatus']['SPIDERFIED'])
       marker
     delete @spiderfying
     @spiderfied = yes
@@ -253,6 +315,7 @@ class @['OverlappingMarkerSpiderfier']
           ge.removeListener(listeners.highlight)
           ge.removeListener(listeners.unhighlight)
         delete marker['_omsData']
+        @['formatMarkerWithStatus']?(marker, @constructor['markerStatus']['SPIDERFIABLE']) unless marker is markerNotToMove  # if marker is markerNotToMove, formatMarkers is about to be called
         unspiderfiedMarkers.push(marker)
       else
         nonNearbyMarkers.push(marker)
