@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <title>Standard demo — Overlapping Marker Spiderfier</title>
+  <style>
+    html, body { height: auto; }
+    p { margin: 0.75em 0; }
+    #map_element { position: absolute; bottom: 0; left: 0; right: 0; top: 0; }
+  </style>
+</head>
+
+<body>
+  <div id="map_element"></div>
+  <script>var isIE = false;</script><!--[if IE]><script>isIE = true;</script><![endif]-->
+  <script>
+
+    // NOTES
+
+    // this demo adds a couple of niceties: dismissing the InfoWindow when we click another marker or the map,
+    // and different formatting for markers that will spiderfy when clicked
+
+    // for efficiency, we use a single formatting listener on the spiderfier instance
+    // — rather than one per marker — since all markers are otherwise displayed the same
+
+    // oms.addMarker(marker, function(e) { /* handle stuff */ });
+    //
+    // -- is precisely equivalent to --
+    //
+    // marker.setMap(map);
+    // oms.trackMarker(marker);
+    // gm.event.addListener(marker, 'spider_click', function(e) { /* handle stuff */ });
+
+    var mapLibsReady = 0;
+    function mapLibReadyHandler() {
+      if (++ mapLibsReady < 2) return;
+
+      var mapElement = document.getElementById('map_element');
+      var map = new google.maps.Map(mapElement, { center: { lat: 52, lng: -1 }, zoom: 7 });
+      
+      var iw = new google.maps.InfoWindow();
+      function iwClose() { iw.close(); }
+      google.maps.event.addListener(map, 'click', iwClose);
+
+      var oms = new OverlappingMarkerSpiderfier(map, { markersWontMove: true, markersWontHide: true });
+
+      oms.addListener('format', function(marker, status) {
+        var iconURL = status == OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED ? 'marker-highlight.svg' :
+          status == OverlappingMarkerSpiderfier.markerStatus.SPIDERFIABLE ? 'marker-plus.svg' :
+          status == OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIABLE ? 'marker.svg' : 
+          null;
+        var iconSize = new google.maps.Size(23, 32);
+        marker.setIcon({
+          url: iconURL,
+          scaledSize: iconSize  // makes SVG icons work in IE
+        });
+      });
+      
+      for (var i = 0, len = window.mapData.length; i < len; i ++) {
+        (function() {  // make a closure over the marker and marker data
+          var markerData = window.mapData[i];  // e.g. { lat: 50.123, lng: 0.123, text: 'XYZ' }
+          var marker = new google.maps.Marker({
+            position: markerData,
+            optimized: ! isIE  // makes SVG icons work in IE
+          });
+          google.maps.event.addListener(marker, 'click', iwClose);
+          oms.addMarker(marker, function(e) {
+            iw.setContent(markerData.text);
+            iw.open(map, marker);
+          });
+        })();
+      }
+
+      window.map = map;  // for debugging/exploratory use in console
+      window.oms = oms;  // ditto
+    }
+
+    // randomize some overlapping map data -- more normally we'd load some JSON data instead
+    
+    var baseJitter = 2.5;
+    var clusterJitterMax = 0.1;
+    var rnd = Math.random;
+    var data = [];
+    var clusterSizes = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 12, 18, 24];
+    for (var i = 0; i < clusterSizes.length; i++) {
+      var baseLon = -1 - baseJitter / 2 + rnd() * baseJitter;
+      var baseLat = 52 - baseJitter / 2 + rnd() * baseJitter;
+      var clusterJitter = clusterJitterMax * rnd();
+      for (var j = 0; j < clusterSizes[i]; j ++) data.push({
+        lng:  baseLon - clusterJitter + rnd() * clusterJitter,
+        lat:  baseLat - clusterJitter + rnd() * clusterJitter,
+        text: Math.round(rnd() * 100) + '% happy'
+      });
+    }
+    window.mapData = data;
+
+  </script>
+
+  <script async defer src="https://maps.google.com/maps/api/js?v=3&callback=mapLibReadyHandler&key=AIzaSyBKx-UGkzpvSol3xk5CiuBK7aSVs_1kgm4"></script>
+  <script async defer src="bin/oms.min.js?spiderfier_callback=mapLibReadyHandler"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <title>Fancy demo — Overlapping Marker Spiderfier</title>
+  <style>
+    html, body { height: auto; font: 14px 'Helvetica Neue', 'Arial', sans-serif; }
+    p { margin: 0.75em 0; }
+    ul { margin: 0; padding: 0; }
+    a { cursor: pointer; }
+    #map_element { position: absolute; bottom: 0; left: 0; right: 0; top: 0; }
+    #legend { position: absolute; right: 20px; top: 20px; background: rgba(0,0,0,0.5); color: #fff; }
+    #legend ul { padding: 10px 20px 10px 10px; margin: 0 0 0 20px; }
+  </style>
+</head>
+
+<body>
+  <div id="map_element"></div>
+  <div id="legend">
+    <ul>
+      <li><b>Move marker</b>: click and drag</li>
+      <li><b>Add marker</b>: right-click map</li>
+      <li><b>Remove/hide marker</b>: right-click marker</li>
+    </ul>
+  </div>
+  <script>var isIE = false;</script><!--[if IE]><script>isIE = true;</script><![endif]-->
+  <script>
+
+    // NOTES
+
+    // this example demonstrates all features:
+
+    // each marker has its own colour, so formatting is done with a marker-level listener
+
+    // markers can be moved (by dragging), added (by right-clicking on the map), and
+    // removed or temporarily hidden (by right-clicking on a marker)
+
+    var mapLibsReady = 0;
+    function mapLibReadyHandler() {
+      if (++ mapLibsReady < 2) return;
+
+      var mapElement = document.getElementById('map_element');
+      var map = new google.maps.Map(mapElement, { center: { lat: 52, lng: -1 }, zoom: 7 });
+      
+      var iw = new google.maps.InfoWindow();
+      function iwClose() { iw.close(); }
+      google.maps.event.addListener(map, 'click', iwClose);
+
+      var oms = new OverlappingMarkerSpiderfier(map);
+      var white = { r: 255, g: 255, b: 255 };
+
+      for (var i = 0, len = window.mapData.length; i < len; i ++) addMarkerWithData(window.mapData[i]);
+
+      google.maps.event.addListener(map, 'rightclick', function(e) {
+        var markerData = { lat: e.latLng.lat(), lng: e.latLng.lng(), rgb: { r: 180, g: 180, b: 180 } };
+        addMarkerWithData(markerData);
+      });
+
+      function addMarkerWithData(markerData) {
+        var marker = new google.maps.Marker({
+          position: markerData,
+          draggable: true,
+          optimized: ! isIE  // makes SVG icons work in IE
+        });
+        google.maps.event.addListener(marker, 'click', iwClose);
+        google.maps.event.addListener(marker, 'spider_format', function(status) {
+          marker.setIcon({
+            url: iconWithColours(markerData.rgb, white,
+              status == OverlappingMarkerSpiderfier.markerStatus.SPIDERFIABLE ? white : null),
+            scaledSize: new google.maps.Size(23, 32)  // makes SVG icons work in IE
+          });
+        });
+        oms.addMarker(marker, function(e) {
+          iw.setContent('R: ' + markerData.rgb.r + '<br />G: ' + markerData.rgb.g + '<br />B: ' + markerData.rgb.b);
+          iw.open(map, marker);
+        });
+
+        function makeLink(text, handler) {
+          var a = document.createElement('a');
+          a.appendChild(document.createTextNode(text));
+          a.addEventListener('click', handler);
+          var li = document.createElement('li');
+          li.appendChild(a);
+          return li;
+        }
+
+        google.maps.event.addListener(marker, 'rightclick', function(e) {
+          var ul = document.createElement('ul');
+          ul.appendChild(makeLink('Remove', function() {
+            oms.removeMarker(marker);
+            iwClose();
+          }));
+          ul.appendChild(makeLink('Hide for 2s', function() {
+            marker.setVisible(false);
+            setTimeout(function() { marker.setVisible(true); }, 2000);
+            iwClose();
+          }));
+          iw.setContent(ul);
+          iw.open(map, marker);
+        });
+      }
+
+      window.map = map;  // for debugging/exploratory use in console
+      window.oms = oms;  // ditto
+    }
+
+    var iconWithColours = (function() {
+      // generate a data: URI for an SVG marker with specified colors and optional '+' motif
+      // I _think_ this will work back to IE9
+
+      function processTemplate(str) {
+        var template = str.split('`');
+        for (var i = 0, len = template.length; i < len; i += 2) template[i] = encodeURIComponent(template[i]);
+        return template;
+      }
+      function applyTemplate(template, values) {
+        var result = template.slice();
+        for (var i = 1, len = template.length; i < len; i += 2) result[i] = values[result[i]];
+        return result.join('');
+      }
+
+      var svgTemplate = processTemplate('<svg viewBox="0 0 23 32" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M22 11c0 1.42-.226 2.585-.677 3.496l-7.465 15.117c-.218.43-.543.77-.974 1.016-.43.246-.892.37-1.384.37-.492 0-.954-.124-1.384-.37-.43-.248-.75-.587-.954-1.017L1.677 14.496C1.227 13.586 1 12.42 1 11c0-2.76 1.025-5.117 3.076-7.07C6.126 1.977 8.602 1 11.5 1c2.898 0 5.373.977 7.424 2.93C20.974 5.883 22 8.24 22 11z" stroke="`stroke`" stroke-width=".6" fill="`fill`" fill-rule="nonzero"/>`plus`</g></svg>');
+
+      var plusTemplate = processTemplate('<path d="M17 11.012c0-.607-.51-1.117-1.115-1.117h-3.222v-3.23c0-.63-.533-1.165-1.163-1.165s-1.163.534-1.163 1.166v3.23H7.115C6.51 9.895 6 10.405 6 11.01c0 .607.51 1.117 1.115 1.117h3.222v3.204c0 .632.533 1.166 1.163 1.166s1.163-.534 1.163-1.166V12.13h3.222c.606 0 1.115-.51 1.115-1.118z" fill="`fill`"/>');
+
+      var rgbTemplate = processTemplate('rgb(`r`,`g`,`b`)');
+
+      return function(fill, stroke, plus) {
+        var svg = applyTemplate(svgTemplate, {
+          fill: applyTemplate(rgbTemplate, fill),
+          stroke: applyTemplate(rgbTemplate, stroke),
+          plus: plus ? applyTemplate(plusTemplate, { fill: applyTemplate(rgbTemplate, plus) }) : ''
+        });
+        return 'data:image/svg+xml,' + svg;
+      }
+    })();
+
+    // randomize some overlapping map data -- more normally we'd load some JSON data instead
+    var baseJitter = 2.5;
+    var clusterJitterMax = 0.1;
+    var rnd = Math.random;
+    var data = [];
+    var clusterSizes = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 12, 18, 24];
+    for (var i = 0; i < clusterSizes.length; i++) {
+      var baseLon = -1 - baseJitter / 2 + rnd() * baseJitter;
+      var baseLat = 52 - baseJitter / 2 + rnd() * baseJitter;
+      var clusterJitter = clusterJitterMax * rnd();
+      for (var j = 0; j < clusterSizes[i]; j ++) data.push({
+        lng:  baseLon - clusterJitter + rnd() * clusterJitter,
+        lat:  baseLat - clusterJitter + rnd() * clusterJitter,
+        rgb: { r: Math.floor(rnd() * 200), g: Math.floor(rnd() * 200), b: Math.floor(rnd() * 200) }
+      });
+    }
+    window.mapData = data;  // for debugging/exploratory use in console
+
+  </script>
+
+  <script async defer src="https://maps.google.com/maps/api/js?v=3&callback=mapLibReadyHandler&key=AIzaSyBKx-UGkzpvSol3xk5CiuBK7aSVs_1kgm4"></script>
+  <script async defer src="bin/oms.min.js?spiderfier_callback=mapLibReadyHandler"></script>
+</body>
+</html>
