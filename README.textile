@@ -100,6 +100,29 @@ bc. for (var i = 0, len = window.mapData.length; i < len; i ++) {
   })();
 }
 
+h3. Marker formatting
+
+New in version 1.0, you can add marker formatting listeners to differentiate between markers that will and won't spiderfy (and that are and aren't spiderfied).
+
+You can either add a @format@ listener to the spiderfier instance (simplest if all your markers look the same, aside from their spiderfying status), or a @spider_format@ listener to each individual marker (useful if you independently have different marker styles).
+
+The first of these options, as seen in the "standard demo source":https://github.com/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo-2.html, looks something like this:
+
+bc. oms.addListener('format', function(marker, status) {
+  var iconURL = status == OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED ? 'marker-highlight.svg' :
+    status == OverlappingMarkerSpiderfier.markerStatus.SPIDERFIABLE ? 'marker-plus.svg' :
+    status == OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIABLE ? 'marker.svg' : 
+    null;
+  marker.setIcon({
+    url: iconURL,
+    scaledSize: new google.maps.Size(23, 32);  // makes SVG icons work in IE
+  });
+});
+
+For an example of the second, per-marker option, see the "fancy demo source":https://github.com/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo-2.html.
+
+Again, thanks to "Graphileon":http://www.graphileon.com/ for sponsoring this feature.
+
 
 h2. Docs
 
