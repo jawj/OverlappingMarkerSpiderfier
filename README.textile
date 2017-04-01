@@ -1,87 +1,113 @@
 h1. Overlapping Marker Spiderfier for Google Maps API v3
 
-*Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that overlap each other spring apart gracefully when you click them, so you can pick the one you meant?*
+*Ever noticed how, in "Google Earth":http://earth.google.com, marker pins that overlap each other spring apart gracefully when you click them, so you can pick the one you wanted?*
 
-*And ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing doesn't happen?*
+*Ever noticed how, when using the "Google Maps API":http://code.google.com/apis/maps/documentation/javascript/, the same thing doesn't happen?*
 
-This code makes Google Maps API *version 3* map markers behave in that Google Earth way (minus the animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
+This library makes map markers in the Google Maps API (version 3) behave in that Google Earth way (minus the animation). Small numbers of markers (yes, up to 8) spiderfy into a circle. Larger numbers fan out into a more space-efficient spiral.
 
-The compiled code has no dependencies beyond Google Maps. And it's under 3K when compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/ and gzipped.
+The compiled code has no dependencies beyond Google Maps. Compiled out of "CoffeeScript":http://jashkenas.github.com/coffee-script/, minified with Google's "Closure Compiler":http://code.google.com/closure/compiler/ and gzipped, it's under 4KB.
 
-I wrote it as part of the data download feature for "Mappiness":http://www.mappiness.org.uk/maps/.
-
-*There's now also "a port for the Leaflet maps API":https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet.*
+I originally wrote it as part of "Mappiness":http://www.mappiness.org.uk/maps/. There is also "a port for the Leaflet maps API":https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet, which has fewer features.
 
 h3. Doesn't clustering solve this problem?
 
 You may have seen the "marker clustering library":http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/docs/reference.html, which also helps deal with markers that are close together.
 
-That might be what you want. However, it probably *isn't* what you want (or isn't the only thing you want) if you have markers that could be in the exact same location, or close enough to overlap even at the maximum zoom level. In that case, clustering won't help your users see and/or click on the marker they're looking for.
+That might be what you want. However, it probably *isn't* what you want (or isn't the *only* thing you want) if you have markers that could be in the exact same location, or close enough to overlap even at maximum zoom. In that case, clustering won't help your users see and/or click on the marker they're looking for.
 
-(I'm told that the OverlappingMarkerSpiderfier also plays nice with clustering -- i.e. once you get down to a zoom level where individual markers are shown, these markers then spiderfy happily -- but I haven't yet tried it myself).
+(I'm told that the OverlappingMarkerSpiderfier plays nice with clustering -- i.e. once you get down to a zoom level where individual markers are shown, these markers then spiderfy happily -- but I haven't yet tried it myself).
+
+h2. What's new?
+
+h3. 1.0
+
+Version 1.0 brings three key enhancements:
+
+* Easy differential formatting of markers that will and won't spiderfy on click (via a new event listener). Thanks go to "Graphileon":http://www.graphileon.com/ for sponsoring this much-requested feature.
+
+* Simplified integration, via a per-marker @spider_click@ listener that's a direct replacement for the standard @click@ listener.
+
+* Support for async/deferred loading in parallel with Google Maps. We no longer require the Google Maps API to be loaded first.
+
+Also, a few potentially *breaking changes*:
+
+* The methods @addMarker()@, @removeMarker()@ and @clearMarkers()@ have been renamed to @trackMarker()@, @forgetMarker()@ and @forgetAllMarkers()@. This better reflects what they do. At the same time, new shortcut methods @addMarker()@, @removeMarker()@ and @removeAllMarkers()@ have been added — these call @trackMarker()@, @forgetMarker()@ or @forgetAllMarkers()@ respectively *and also* add or remove the relevant marker(s) from the Google Map itself.
+
+If you've only been using @addMarker()@ and @removeMarker()@, and you always add or remove your markers from the map at the same time as the spiderfier, you won't need to do anything new.
+
+h3. 0.3
+
+Breaking changes:
+
+* The @willSpiderfy(marker)@ and @markersThatWillAndWontSpiderfy()@ methods were replaced by the (similar, but different) @markersNearMarker(marker)@ and @markersNearAnyOtherMarker()@ methods. This should only worry advanced users.
+
 
 h2. Demo
 
-See the "demo map":https://jawj.github.io/OverlappingMarkerSpiderfier/demo.html (the data is random: reload the map to reposition the markers).
+There are three demo maps, showing increasing levels of functionality and complexity. Studying the source of these may well be the best way to understand how to use this library.
+
+* "Simple demo":https://jawj.github.io/OverlappingMarkerSpiderfier/demo-1.html
+* "Standard demo":https://jawj.github.io/OverlappingMarkerSpiderfier/demo-2.html
+* "Fancy demo":https://jawj.github.io/OverlappingMarkerSpiderfier/demo-3.html
+
+In all cases, the data is randomised: reload the map to reposition the markers.
+
 
 h2. Download
 
 Download "the compiled, minified JS source":http://jawj.github.com/OverlappingMarkerSpiderfier/bin/oms.min.js.
 
-*Please note: version 0.3 introduces a breaking change. The @willSpiderfy(marker)@ and @markersThatWillAndWontSpiderfy()@ methods have been replaced with the (similar, but different) @markersNearMarker(marker)@ and @markersNearAnyOtherMarker()@ methods.*
 
 h2. How to use
 
-See the "demo map source":https://github.com/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo.html, or follow along here for a slightly simpler usage with commentary.
+See the source of the demo maps, or follow along here for a slightly simpler usage with commentary.
 
-Create your map like normal:
+* "Simple demo source":https://github.com/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo-1.html
+* "Standard demo source":https://github.com/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo-2.html
+* "Fancy demo source":https://github.com/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo-3.html
 
-bc. var gm = google.maps;
-var map = new gm.Map(document.getElementById('map_canvas'), {
-  mapTypeId: gm.MapTypeId.SATELLITE,
-  center: new gm.LatLng(50, 0), 
-  zoom: 6
+
+h3. Simplest integration
+
+Create a map and an InfoWindow as per usual:
+
+bc. var mapElement = document.getElementById('map_element');
+var map = new google.maps.Map(mapElement, { center: new google.maps.LatLng(50, 0), zoom: 6 });
+var iw = new google.maps.InfoWindow();
+
+Now create an @OverlappingMarkerSpiderfier@ instance associated with the map (the three options set here are not required, but will save some memory and CPU in simple use cases like this one):
+
+bc. var oms = new OverlappingMarkerSpiderfier(map, { 
+  markersWontMove: true, 
+  markersWontHide: true,
+  basicFormatEvents: true
 });
 
-Create an @OverlappingMarkerSpiderfier@ instance:
+As you create your markers, instead of attaching @click@ listeners, attach @spider_click@ listeners.
 
-bc. var oms = new OverlappingMarkerSpiderfier(map);
+And, instead of adding them to the map with @marker.setMap(map)@, add them to your @OverlappingMarkerSpiderfier@ instance (and the map too) with @oms.addMarker(marker)@.
 
-Instead of adding click listeners to your markers directly via @google.maps.event.addListener@, add a global listener on the @OverlappingMarkerSpiderfier@ instance instead. The listener will be passed the clicked marker as its first argument, and the Google Maps @event@ object as its second.
-
-bc. var iw = new gm.InfoWindow();
-oms.addListener('click', function(marker, event) {
-  iw.setContent(marker.desc);
-  iw.open(map, marker);
-});
-  
-You can also add listeners on the @spiderfy@ and @unspiderfy@ events, which will be passed an array of the markers affected. In this example, we observe only the @spiderfy@ event, using it to close any open @InfoWindow@:
-  
-bc. oms.addListener('spiderfy', function(markers) {
-  iw.close();
-});
-
-Finally, tell the @OverlappingMarkerSpiderfier@ instance about each marker as you add it, using the @addMarker@ method:
-
-bc. for (var i = 0; i < window.mapData.length; i ++) {
-  var datum = window.mapData[i];
-  var loc = new gm.LatLng(datum.lat, datum.lon);
-  var marker = new gm.Marker({
-    position: loc,
-    title: datum.h,
-    map: map
-  });
-  marker.desc = datum.d;
-  oms.addMarker(marker);  // <-- here
+bc. for (var i = 0, len = window.mapData.length; i < len; i ++) {
+  (function() {  // make a closure over the marker and marker data
+    var markerData = window.mapData[i];  // e.g. { lat: 50.123, lng: 0.123, text: 'XYZ' }
+    var marker = new google.maps.Marker({ position: markerData });  // markerData works here as a LatLngLiteral
+    google.maps.event.addListener(marker, 'spider_click', function(e) {  // 'spider_click', not plain 'click'
+      iw.setContent(markerData.text);
+      iw.open(map, marker);
+    });
+    oms.addMarker(marker);  // adds the marker to the spiderfier _and_ the map
+  })();
 }
+
 
 h2. Docs
 
 h3. Loading
 
-The @google.maps@ object must be available when this code runs -- i.e. put the Google Maps API &lt;script&gt; tag before this one.
+The Google Maps API code changes frequently. Some earlier versions had broken support for z-indices, and the 'frozen' versions appear not to be as frozen as you'd like. At this moment, the 'stable' version 3.27 seems to work well, but do test with whatever version you fix on. Sometimes, glitches can be fixed by setting the @optimized: false@ on your markers.
 
-The Google Maps API code changes frequently. Some earlier versions had broken support for z-indices, and the 'frozen' versions appear not to be as frozen as you'd like. At this moment, the 'stable' version 3.7 seems to work well, but do test with whatever version you fix on.
+To enable async/deferred loading, as used by the Google Maps library itself, you can either provide a top-level function named @spiderfier_callback@, or specify a @spiderfier_callback@ parameter that names some other top-level function in the script @src@ attribute (i.e. @<script src="/path/to/oms.min.js?spiderfier_callback=myCallbackFunction"><script>@).
 
 
 h3. Construction
@@ -92,83 +118,151 @@ Creates an instance associated with @map@ (a @google.maps.Map@).
 
 The @options@ argument is an optional @Object@ specifying any options you want changed from their defaults. The available options are:
 
-*markersWontMove* and *markersWontHide* (defaults: @false@)
+
+*@markersWontMove@* (default: @false@)
+*@markersWontHide@* (default: @false@)
 
 By default, change events for each added marker's @position@ and @visibility@ are observed (so that, if a spiderfied marker is moved or hidden, all spiderfied markers are unspiderfied, and the new position is respected where applicable).
 
-However, if you know that you won't be moving and/or hiding any of the markers you add to this instance, you can save memory (a closure per marker in each case) by setting the options named @markersWontMove@ and/or @markersWontHide@ to @true@ (or anything "truthy":http://isolani.co.uk/blog/javascript/TruthyFalsyAndTypeCasting).
+However, if you know that you won't be moving and/or hiding any of the markers you add to this instance, you can save memory (a closure per marker in each case) by setting the options named @markersWontMove@ and/or @markersWontHide@ to @true@.
 
 For example, @var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true});@.
 
-*keepSpiderfied* (default: @false@)
+
+*@basicFormatEvents@* (default: @false@)
+
+By default, marker status is recalculated for all markers on any relevant change, triggering any @'spider_format'@ marker listeners and @'format'@ instance listeners, with one of the following status values:
+
+@OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED@
+@OverlappingMarkerSpiderfier.markerStatus.SPIDERFIABLE@
+@OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIABLE@
+
+This recalculation can be quite CPU intensive for large numbers of markers, so if you don't intend to format markers differently depending on whether they will spiderfy when clicked, you should opt out of this behaviour by setting @basicFormatEvents@ to @true@.
+
+Then the @'spider_format'@ and @'format'@ listeners will receive only these status values instead:
+
+@OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED@
+@OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIED@
+
+
+*@keepSpiderfied@* (default: @false@)
 
 By default, the OverlappingMarkerSpiderfier works like Google Earth, in that when you click a spiderfied marker, the markers unspiderfy before any other action takes place. 
 
-Since this can make it tricky for the user to work through a set of markers one by one, you can override this behaviour by setting the @keepSpiderfied@ option to @true@.
+Since this can make it tricky for the user to work through a set of markers one by one, you can override this behaviour by setting the @keepSpiderfied@ option to @true@. Note that the markers _will_ still be unspiderfied if any other marker than those in the currently spiderfied set are clicked.
+
+
+*@ignoreMapClick@* (default: @false@)
+
+By default, clicking an empty spot on the map causes spiderfied markers to unspiderfy. Setting this option to @true@ suppresses that behaviour.
+
 
 *nearbyDistance* (default: @20@).
 
 This is the pixel radius within which a marker is considered to be overlapping a clicked marker.
 
+
 *circleSpiralSwitchover* (default: @9@)
 
 This is the lowest number of markers that will be fanned out into a spiral instead of a circle. Set this to @0@ to always get spirals, or @Infinity@ for all circles.
+
 
 *legWeight* (default: @1.5@) 
 
 This determines the thickness of the lines joining spiderfied markers to their original locations. 
 
+
 h3. Instance methods: managing markers
 
 Note: methods that have no obvious return value return the OverlappingMarkerSpiderfier instance they were called on, in case you want to chain method calls.
 
-*addMarker(marker)*
+*@trackMarker(marker, listener)@*
 
-Adds @marker@ (a @google.maps.Marker@) to be tracked.
+Starts tracking @marker@ (a @google.maps.Marker@), but _does not_ add it to the map. If @listener@ is specified, it is attached to the marker as a @spider_click@ listener.
 
-*removeMarker(marker)*
+*@addMarker(marker, listener)@*
 
-Removes @marker@ from those being tracked. This _does not_ remove the marker from the map (to remove a marker from the map you must call @setMap(null)@ on it, as per usual).
+Starts tracking @marker@ (a @google.maps.Marker@) _and_ adds it to the map. If @listener@ is specified, it is attached to the marker as a @spider_click@ listener.
 
-*clearMarkers()*
+*@forgetMarker(marker)@*
 
-Removes every @marker@ from being tracked. Much quicker than calling @removeMarker@ in a loop, since that has to search the markers array every time.
+Stops @marker@ being tracked, but _does not_ remove it from the map (to remove a marker from the map you must call @setMap(null)@ on it, as per usual, or call @removeMarker(marker)@ instead).
 
-This _does not_ remove the markers from the map (to remove the markers from the map you must call @setMap(null)@ on each of them, as per usual).
+*@removeMarker(marker)@*
 
-*getMarkers()*
+Stops @marker@ being tracked _and_ removes it from the map.
+
+*@forgetAllMarkers()@*
+
+Stops every @marker@ being tracked. Much quicker than calling @forgetMarker(marker)@ in a loop, since that has to search the markers array every time.
+
+This _does not_ remove the markers from the map (to remove the markers from the map you must call @setMap(null)@ on each of them, as per usual, or call @removeAllMarkers()@ instead).
+
+*@removeAllMarkers()@*
+
+Stops every @marker@ being tracked, _and_ removes them all from the map. Much quicker than calling @removeMarker(marker)@ in a loop, since that has to search the markers array every time.
+
+*@getMarkers()@*
 
 Returns an array of all the markers that are currently being tracked. This is a copy of the one used internally, so you can do what you like with it.
 
 
+h3. Marker events
+
+New from version 1, two new events on your markers are supported.
+
+
+*@'spider_click'@*
+
+The @'spider_click'@ event is triggered on a marker when it (a) has no markers nearby and is clicked, or (b) has been spiderfied along with nearby markers, and is then clicked. In general, you'll want to replace your @'click'@ listeners with @'spider_click'@ listeners when integrating the OverlappingMarkerSpiderfier library.
+
+
+*@'spider_format'@*
+
+The @'spider_format'@ event is triggered when the spiderfying status of a marker could have changed. That could be because this marker began to be tracked, because other markers were added, removed or hidden, or because the zoom level changed.
+
+You can use a listener on this event to make a visual distinction between markers that are (a) unspiderfied and will not spiderfy when clicked, (b) unspiderfied and will spiderfy when clicked, or (c) spiderfied.
+
+The listener function receives one argument, which is a status value (one of @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED@, @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIABLE@ or @OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIABLE@ for standard formatting events; or one of @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED@ or @OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIED@ if formatting events have been restricted, for efficiency, via the @basicFormatEvents@ option).
+
+
 h3. Instance methods: managing listeners
 
-*addListener(event, listenerFunc)*
 
-Adds a listener to react to one of three events.
+*@addListener(event, listenerFunc)@*
 
-@event@ may be @'click'@, @'spiderfy'@ or @'unspiderfy'@.
+Adds a listener to react to one of four events.
 
-For @'click'@ events, @listenerFunc@ receives one argument: the clicked marker object. You'll probably want to use this listener to do something like show a @google.maps.InfoWindow@.
+@event@ may be @'click'@, @'format'@, @'spiderfy'@ or @'unspiderfy'@.
 
-For @'spiderfy'@ or @'unspiderfy'@ events, @listenerFunc@ receives two arguments: first, an array of the markers that were spiderfied or unspiderfied; second, an array of the markers that were not. One use for these listeners is to make some distinction between spiderfied and non-spiderfied markers when some markers are spiderfied -- e.g. highlighting those that are spiderfied, or dimming out those that aren't.
+For @'click'@ events, @listenerFunc@ receives one argument: the clicked marker object. You'll probably want to use this listener to do something like show a @google.maps.InfoWindow@. Note that this is the traditional method of responding to a marker click, but you may well now find it easier to add a separate @'spider_click'@ event to each marker instead.
 
-*removeListener(event, listenerFunc)*
+For @'format'@ events, @listenerFunc@ receives two arguments: a marker object, and a status value (one of @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED@, @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIABLE@ or @OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIABLE@ for standard formatting events; or one of @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED@ or @OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIED@ if only basic formatting events have been requested, for efficiency, via the @basicFormatEvents@ option).
+
+For @'spiderfy'@ or @'unspiderfy'@ events, @listenerFunc@ receives two arguments: first, an array of the markers that were spiderfied or unspiderfied; second, an array of the markers that were not. Traditionally, one use for these listeners was to make some distinction between spiderfied and non-spiderfied markers when some markers are spiderfied -- e.g. highlighting those that are spiderfied, or dimming out those that aren't. However, the newer @'format'@ event is now a better and more flexible way to do this.
+
+
+*@removeListener(event, listenerFunc)@*
 
 Removes the specified listener on the specified event.
 
-*clearListeners(event)*
+
+*@clearListeners(event)@*
 
 Removes all listeners on the specified event.
 
-*unspiderfy()*
+
+*@unspiderfy()@*
 
 Returns any spiderfied markers to their original positions, and triggers any listeners you may have set for this event. Unless no markers are spiderfied, in which case it does nothing.
 
 
 h3. Instance methods: advanced use only!
 
-*markersNearMarker(marker, firstOnly)*
+These methods were previously provided mainly to enable differential marker formatting according to whether a marker would spiderfy when clicked; since this is now supported explicitly, you're quite unlikely to need them.
+
+
+*@markersNearMarker(marker, firstOnly)@*
 
 Returns an array of markers within @nearbyDistance@ pixels of @marker@ -- i.e. those that will be spiderfied when @marker@ is clicked. If you pass @true@ as the second argument, the search will stop when a single marker has been found. This is more efficient if all you want to know is whether there are any nearby markers.
 
@@ -178,7 +272,8 @@ The return value of this method may change any time the zoom level changes, and 
 
 Note also that this method relies on the map's @Projection@ object being available, and thus cannot be called until the map's first @idle@ event fires.
 
-*markersNearAnyOtherMarker()*
+
+*@markersNearAnyOtherMarker()@*
 
 Returns an array of all markers that are near one or more other markers -- i.e. those will be spiderfied when clicked.
 
@@ -193,7 +288,7 @@ h3. Properties
 
 You can set the following properties on an OverlappingMarkerSpiderfier instance:
 
-*legColors.usual[mapType]* and *legColors.highlighted[mapType]*
+*@legColors.usual[mapType]@* and *@legColors.highlighted[mapType]@*
 
 These determine the usual and highlighted colours of the lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants ("or a custom map type ID":https://github.com/jawj/OverlappingMarkerSpiderfier/issues/4). 
 
@@ -206,6 +301,7 @@ legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] =
   legColors.highlighted[mti.TERRAIN] = legColors.highlighted[mti.ROADMAP] = '#f00';
 
 You can also get and set any of the options noted in the constructor function documentation above as properties on an OverlappingMarkerSpiderfier instance. However, for some of these options (e.g. @markersWontMove@) modifications won't be applied retroactively.
+
 
 h2. Licence
 
