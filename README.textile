@@ -157,17 +157,17 @@ Since this can make it tricky for the user to work through a set of markers one 
 By default, clicking an empty spot on the map causes spiderfied markers to unspiderfy. Setting this option to @true@ suppresses that behaviour.
 
 
-*nearbyDistance* (default: @20@).
+*@nearbyDistance@* (default: @20@).
 
 This is the pixel radius within which a marker is considered to be overlapping a clicked marker.
 
 
-*circleSpiralSwitchover* (default: @9@)
+*@circleSpiralSwitchover@* (default: @9@)
 
 This is the lowest number of markers that will be fanned out into a spiral instead of a circle. Set this to @0@ to always get spirals, or @Infinity@ for all circles.
 
 
-*legWeight* (default: @1.5@) 
+*@legWeight@* (default: @1.5@) 
 
 This determines the thickness of the lines joining spiderfied markers to their original locations. 
 
@@ -209,7 +209,7 @@ Returns an array of all the markers that are currently being tracked. This is a 
 
 h3. Marker events
 
-New from version 1, two new events on your markers are supported.
+New from version 1.0, two new events are supported on your markers.
 
 
 *@'spider_click'@*
@@ -221,7 +221,7 @@ The @'spider_click'@ event is triggered on a marker when it (a) has no markers n
 
 The @'spider_format'@ event is triggered when the spiderfying status of a marker could have changed. That could be because this marker began to be tracked, because other markers were added, removed or hidden, or because the zoom level changed.
 
-You can use a listener on this event to make a visual distinction between markers that are (a) unspiderfied and will not spiderfy when clicked, (b) unspiderfied and will spiderfy when clicked, or (c) spiderfied.
+You can use a listener on this event to make a visual distinction between markers that are a) unspiderfied and will not spiderfy when clicked, b) unspiderfied and will spiderfy when clicked, or c) spiderfied.
 
 The listener function receives one argument, which is a status value (one of @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED@, @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIABLE@ or @OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIABLE@ for standard formatting events; or one of @OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED@ or @OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIED@ if formatting events have been restricted, for efficiency, via the @basicFormatEvents@ option).
 
