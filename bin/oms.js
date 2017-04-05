@@ -20,7 +20,7 @@ Note: The Google Maps API v3 must be included *before* this code
     ref = [_Class, p];
     for (j = 0, len = ref.length; j < len; j++) {
       x = ref[j];
-      x['VERSION'] = '1.0.0';
+      x['VERSION'] = '1.0.1';
     }
 
     twoPi = Math.PI * 2;
@@ -411,7 +411,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
     p['markersNearAnyOtherMarker'] = function() {
       var i, l, len1, m, mData, ref1, results;
-      mData = this.markerProximityData;
+      mData = this.markerProximityData();
       ref1 = this.markers;
       results = [];
       for (i = l = 0, len1 = ref1.length; l < len1; i = ++l) {
