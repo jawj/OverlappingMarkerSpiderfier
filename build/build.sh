@@ -15,9 +15,4 @@ java -jar /usr/local/closure-compiler/compiler.jar \
   --externs google_maps_api_v3_26.js \
 > $OUTFILE
 
-#   --output_wrapper '(function(){%output%}).call(this);' \
-
 echo '/*' $(date) '*/' >> $OUTFILE
-
-# cp $OUTFILE ../../gh-pages/bin
-# cp ${OUTDIR}${INPREFIX}.js ../../gh-pages/bin
