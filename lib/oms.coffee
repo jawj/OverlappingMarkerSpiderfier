@@ -9,7 +9,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  x['VERSION'] = '1.0.0' for x in [@, p]  # better on @, but defined on p too for backward-compat
+  x['VERSION'] = '1.0.1' for x in [@, p]  # better on @, but defined on p too for backward-compat
   twoPi = Math.PI * 2
   gm = ge = mt = null  # for scoping purposes
   
@@ -261,7 +261,7 @@ class @['OverlappingMarkerSpiderfier']
     mData
 
   p['markersNearAnyOtherMarker'] = ->  # *very* much quicker than calling markersNearMarker in a loop
-    mData = @markerProximityData
+    mData = @markerProximityData()
     m for m, i in @markers when mData[i].willSpiderfy
   
   # 'format' (on OMS instance) and 'spider_format' (per marker) will be called:
