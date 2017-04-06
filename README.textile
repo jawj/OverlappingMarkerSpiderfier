@@ -119,7 +119,7 @@ bc. oms.addListener('format', function(marker, status) {
   });
 });
 
-For an example of the second, per-marker option, see the "fancy demo source":https://github.com/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo-2.html.
+For an example of the second, per-marker option, see the "fancy demo source":https://github.com/jawj/OverlappingMarkerSpiderfier/blob/gh-pages/demo-3.html.
 
 Again, thanks to "Graphileon":http://www.graphileon.com/ for sponsoring this feature.
 
