@@ -206,7 +206,7 @@ Note: The Google Maps API v3 must be included *before* this code
     p['removeAllMarkers'] = p['clearMarkers'] = function() {
       var l, len1, marker, markers;
       markers = this['getMarkers']();
-      this[forgetAllMarkers]();
+      this['forgetAllMarkers']();
       for (l = 0, len1 = markers.length; l < len1; l++) {
         marker = markers[l];
         marker.setMap(null);
