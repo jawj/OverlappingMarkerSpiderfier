@@ -20,7 +20,7 @@ Note: The Google Maps API v3 must be included *before* this code
     ref = [_Class, p];
     for (j = 0, len = ref.length; j < len; j++) {
       x = ref[j];
-      x['VERSION'] = '1.0.1';
+      x['VERSION'] = '1.0.2';
     }
 
     twoPi = Math.PI * 2;
@@ -529,7 +529,8 @@ Note: The Google Maps API v3 must be included *before* this code
             zIndex: this['usualLegZIndex']
           });
           marker['_omsData'] = {
-            usualPosition: marker.position,
+            usualPosition: marker.getPosition(),
+            usualZIndex: marker.getZIndex(),
             leg: leg
           };
           if (this['legColors']['highlighted'][this.map.mapTypeId] !== this['legColors']['usual'][this.map.mapTypeId]) {
@@ -570,7 +571,7 @@ Note: The Google Maps API v3 must be included *before* this code
           if (marker !== markerNotToMove) {
             marker.setPosition(marker['_omsData'].usualPosition);
           }
-          marker.setZIndex(null);
+          marker.setZIndex(marker['_omsData'].usualZIndex);
           listeners = marker['_omsData'].hightlightListeners;
           if (listeners != null) {
             ge.removeListener(listeners.highlight);
