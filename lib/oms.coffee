@@ -150,7 +150,7 @@ class @['OverlappingMarkerSpiderfier']
   
   p['removeAllMarkers'] = p['clearMarkers'] = ->  # much quicker than calling removeMarker for each marker; clearMarkers is deprecated as unclear
     markers = @['getMarkers']()
-    @[forgetAllMarkers]()
+    @['forgetAllMarkers']()
     marker.setMap(null) for marker in markers
     @
 
