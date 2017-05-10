@@ -9,7 +9,7 @@ Note: The Google Maps API v3 must be included *before* this code
 
 class @['OverlappingMarkerSpiderfier']
   p = @::  # this saves a lot of repetition of .prototype that isn't optimized away
-  x['VERSION'] = '1.0.1' for x in [@, p]  # better on @, but defined on p too for backward-compat
+  x['VERSION'] = '1.0.2' for x in [@, p]  # better on @, but defined on p too for backward-compat
   twoPi = Math.PI * 2
   gm = ge = mt = null  # for scoping purposes
   
@@ -324,8 +324,8 @@ class @['OverlappingMarkerSpiderfier']
         strokeWeight: @['legWeight']
         zIndex: @['usualLegZIndex']
       marker['_omsData'] = 
-        usualPosition: marker.position
-        usualzIndex: marker.zIndex
+        usualPosition: marker.getPosition()
+        usualZIndex: marker.getZIndex()
         leg: leg
       unless @['legColors']['highlighted'][@map.mapTypeId] is
              @['legColors']['usual'][@map.mapTypeId]
@@ -350,7 +350,7 @@ class @['OverlappingMarkerSpiderfier']
       if marker['_omsData']?
         marker['_omsData'].leg.setMap(null)
         marker.setPosition(marker['_omsData'].usualPosition) unless marker is markerNotToMove
-        marker.setZIndex(marker['_omsData'].usualzIndex)
+        marker.setZIndex(marker['_omsData'].usualZIndex)
         listeners = marker['_omsData'].hightlightListeners
         if listeners?
           ge.removeListener(listeners.highlight)
