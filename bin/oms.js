@@ -20,7 +20,7 @@ Note: The Google Maps API v3 must be included *before* this code
     ref = [_Class, p];
     for (j = 0, len = ref.length; j < len; j++) {
       x = ref[j];
-      x['VERSION'] = '1.0.2';
+      x['VERSION'] = '1.0.3';
     }
 
     twoPi = Math.PI * 2;
@@ -159,6 +159,7 @@ Note: The Google Maps API v3 must be included *before* this code
       if (this['basicFormatEvents']) {
         this.trigger('format', marker, this.constructor['markerStatus']['UNSPIDERFIED']);
       } else {
+        this.trigger('format', marker, this.constructor['markerStatus']['UNSPIDERFIABLE']);
         this.formatMarkers();
       }
       return this;
