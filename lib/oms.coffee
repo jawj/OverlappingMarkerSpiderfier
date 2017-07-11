@@ -26,7 +26,7 @@ class @['OverlappingMarkerSpiderfier']
 
   constructor: (@map, opts = {}) ->
 
-    # initialize prototype variables only on first contruction, 
+    # initialize prototype variables only on first construction, 
     # because some rely on GMaps properties that may not be available on script load
 
     unless @constructor.hasInitialized?
