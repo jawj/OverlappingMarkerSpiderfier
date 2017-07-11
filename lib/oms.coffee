@@ -2,7 +2,6 @@
 https://github.com/jawj/OverlappingMarkerSpiderfier
 Copyright (c) 2011 - 2017 George MacKerron
 Released under the MIT licence: http://opensource.org/licenses/mit-license
-Note: The Google Maps API v3 must be included *before* this code
 ###
 
 # NB. string literal properties -- object['key'] -- are for Closure Compiler ADVANCED_OPTIMIZATION
