@@ -14,9 +14,9 @@ h3. Doesn't clustering solve this problem?
 
 You may have seen the "marker clustering library":http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/docs/reference.html, which also helps deal with markers that are close together.
 
-That might be what you want. However, it probably *isn't* what you want (or isn't the *only* thing you want) if you have markers that could be in the exact same location, or close enough to overlap even at maximum zoom. In that case, clustering won't help your users see and/or click on the marker they're looking for.
+That might be what you want. However, it probably isn't what you want (or isn't the _only_ thing you want) if you have markers that could be in the exact same location, or close enough to overlap even at maximum zoom. In that case, clustering won't help your users see and/or click on the marker they're looking for.
 
-(I'm told that the OverlappingMarkerSpiderfier plays nice with clustering -- i.e. once you get down to a zoom level where individual markers are shown, these markers then spiderfy happily -- but I haven't yet tried it myself).
+OverlappingMarkerSpiderfier plays nice with clustering, and you can use them together. Once you get down to a zoom level where individual markers are shown, these markers then spiderfy happily. But you may need to set the @maxZoom@ parameter on the clusterer to ensure that it doesn't cluster identical points all the way to the map's maximum zoom level (@14@ or @15@ have been "suggested":https://stackoverflow.com/questions/9726920/integrating-spiderfier-js-into-markerclusterer-v3-to-explode-multi-markers-with  as sensible values).
 
 h2. What's new?
 
