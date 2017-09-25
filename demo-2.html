@@ -3,6 +3,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <meta http-equiv="x-ua-compatible" content="IE=10" />
   <title>Standard demo — Overlapping Marker Spiderfier</title>
   <style>
     html, body { height: auto; }
@@ -53,6 +54,7 @@
         var iconSize = new google.maps.Size(23, 32);
         marker.setIcon({
           url: iconURL,
+          size: iconSize,
           scaledSize: iconSize  // makes SVG icons work in IE
         });
       });
@@ -97,7 +99,7 @@
 
   </script>
 
-  <script async defer src="https://maps.google.com/maps/api/js?v=3&callback=mapLibReadyHandler&key=AIzaSyBKx-UGkzpvSol3xk5CiuBK7aSVs_1kgm4"></script>
+  <script async defer src="https://maps.google.com/maps/api/js?v=3&callback=mapLibReadyHandler&key=AIzaSyB9uMQ5-OdTNj6GA6EGuYOQFo4ld5HD7bE"></script>
   <script async defer src="bin/oms.min.js?spiderfier_callback=mapLibReadyHandler"></script>
 </body>
 </html>
