@@ -80,8 +80,8 @@ var iw = new google.maps.InfoWindow();
 
 Now create an @OverlappingMarkerSpiderfier@ instance associated with the map (the three options set here are not required, but will save some memory and CPU in simple use cases like this one):
 
-bc. var oms = new OverlappingMarkerSpiderfier(map, { 
-  markersWontMove: true, 
+bc. var oms = new OverlappingMarkerSpiderfier(map, {
+  markersWontMove: true,
   markersWontHide: true,
   basicFormatEvents: true
 });
@@ -113,7 +113,7 @@ The first of these options, as seen in the "standard demo source":https://github
 bc. oms.addListener('format', function(marker, status) {
   var iconURL = status == OverlappingMarkerSpiderfier.markerStatus.SPIDERFIED ? 'marker-highlight.svg' :
     status == OverlappingMarkerSpiderfier.markerStatus.SPIDERFIABLE ? 'marker-plus.svg' :
-    status == OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIABLE ? 'marker.svg' : 
+    status == OverlappingMarkerSpiderfier.markerStatus.UNSPIDERFIABLE ? 'marker.svg' :
     null;
   marker.setIcon({
     url: iconURL,
@@ -172,7 +172,7 @@ Then the @'spider_format'@ and @'format'@ listeners will receive only these stat
 
 *@keepSpiderfied@* (default: @false@)
 
-By default, the OverlappingMarkerSpiderfier works like Google Earth, in that when you click a spiderfied marker, the markers unspiderfy before any other action takes place. 
+By default, the OverlappingMarkerSpiderfier works like Google Earth, in that when you click a spiderfied marker, the markers unspiderfy before any other action takes place.
 
 Since this can make it tricky for the user to work through a set of markers one by one, you can override this behaviour by setting the @keepSpiderfied@ option to @true@. Note that the markers _will_ still be unspiderfied if any other marker than those in the currently spiderfied set are clicked.
 
@@ -192,9 +192,14 @@ This is the pixel radius within which a marker is considered to be overlapping a
 This is the lowest number of markers that will be fanned out into a spiral instead of a circle. Set this to @0@ to always get spirals, or @Infinity@ for all circles.
 
 
-*@legWeight@* (default: @1.5@) 
+*@circleFootSeparation@*  (default: @23@)
 
-This determines the thickness of the lines joining spiderfied markers to their original locations. 
+The individual distance between the spiderfied markers.
+
+
+*@legWeight@* (default: @1.5@)
+
+This determines the thickness of the lines joining spiderfied markers to their original locations.
 
 
 h3. Instance methods: managing markers
@@ -315,14 +320,14 @@ You can set the following properties on an OverlappingMarkerSpiderfier instance:
 
 *@legColors.usual[mapType]@* and *@legColors.highlighted[mapType]@*
 
-These determine the usual and highlighted colours of the lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants ("or a custom map type ID":https://github.com/jawj/OverlappingMarkerSpiderfier/issues/4). 
+These determine the usual and highlighted colours of the lines, where @mapType@ is one of the @google.maps.MapTypeId@ constants ("or a custom map type ID":https://github.com/jawj/OverlappingMarkerSpiderfier/issues/4).
 
 The defaults are as follows:
 
 bc. var mti = google.maps.MapTypeId;
 legColors.usual[mti.HYBRID] = legColors.usual[mti.SATELLITE] = '#fff';
 legColors.usual[mti.TERRAIN] = legColors.usual[mti.ROADMAP] = '#444';
-legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] = 
+legColors.highlighted[mti.HYBRID] = legColors.highlighted[mti.SATELLITE] =
   legColors.highlighted[mti.TERRAIN] = legColors.highlighted[mti.ROADMAP] = '#f00';
 
 You can also get and set any of the options noted in the constructor function documentation above as properties on an OverlappingMarkerSpiderfier instance. However, for some of these options (e.g. @markersWontMove@) modifications won't be applied retroactively.
