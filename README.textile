@@ -193,8 +193,16 @@ This is the lowest number of markers that will be fanned out into a spiral inste
 
 
 *@circleFootSeparation@*  (default: @23@)
+*@circleStartAngle@* (default: @pi / 6@)
 
-The individual distance between the spiderfied markers.
+Parameters that determine the positioning of markers when spiderfied out into a circle. The defaults work pretty well for a standard Google Maps marker icon, but you may want to change them for icons that are larger/smaller/differently shaped.
+
+
+*@spiralFootSeparation@* (default: @26@)
+*@spiralLengthStart@* (default: @11@)
+*@spiralLengthFactor@* (default: @4@)     
+
+Parameters determining the positioning of markers when spiderfied out into a spiral. The defaults work pretty well for a standard Google Maps marker icon, but you may want to change them for icons that are larger/smaller/differently shaped. If you want to know exactly how they work — read the code! But to get the arrangement you're looking for, you probably just need to experiment.
 
 
 *@legWeight@* (default: @1.5@)
