@@ -344,5 +344,3 @@ You can also get and set any of the options noted in the constructor function do
 h2. Licence
 
 This software is released under the "MIT licence":http://www.opensource.org/licenses/mit-license.php.
-
-Finally, if you want to say thanks, I am on "Gittip":https://www.gittip.com/jawj.
