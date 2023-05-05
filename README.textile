@@ -12,7 +12,7 @@ I originally wrote it as part of "Mappiness":http://www.mappiness.org.uk/maps/. 
 
 h3. Doesn't clustering solve this problem?
 
-You may have seen the "marker clustering library":https://github.com/googlemaps/v3-utility-library/tree/master/markerclusterer, which also helps deal with markers that are close together.
+You may have seen the "marker clustering library":https://github.com/googlemaps/js-markerclusterer, which also helps deal with markers that are close together.
 
 That might be what you want. However, it probably isn't what you want (or isn't the _only_ thing you want) if you have markers that could be in the exact same location, or close enough to overlap even at maximum zoom. In that case, clustering won't help your users see and/or click on the marker they're looking for.
 
